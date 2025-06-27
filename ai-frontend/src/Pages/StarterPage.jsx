@@ -17,7 +17,7 @@ function StarterPage() {
     const { username, loading,userEmail, setUsername} = useUsername();
     const onDrop = (acceptedFiles) => {
         setFiles(acceptedFiles[0]);
-    }
+    } // this adds the firts pdf to the state setFiles when a file is dropped or added 
 
     const {getRootProps, getInputProps, isDragActive} = 
     useDropzone({onDrop,

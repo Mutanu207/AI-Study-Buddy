@@ -1,16 +1,16 @@
 import { createNewSessions,fetchFilePath } from "./sessions.model.js"
 import { generateQuestions } from "../ai/ai.service.js"
-export const newSessions = async (docid,userid) => {
+export const newSessions = async (document_id,userid) => {
     try{
         //call model db thats saves documentid and userid and returns session id//
-        const session= await createNewSessions(docid,userid)
+        const session= await createNewSessions(document_id,userid)
         console.log(session)
         //session contains session id//
         if(!session){
             throw new Error("No session id found")
         }
         //get file path to send to ai folder//
-        const pdf_path = await fetchFilePath(docid)
+        const pdf_path = await fetchFilePath(document_id)
         if(!pdf_path){   
             throw new Error("Make sure you have uploaded the PDF")
         }
@@ -18,7 +18,7 @@ export const newSessions = async (docid,userid) => {
         const sessionId= session.id 
         const file_path= pdf_path.file_path
         //send req to the ai folder which is the bridge between the express and rag-python//
-        const questions= await generateQuestions(sessionId, file_path)
+        const questions= await generateQuestions(sessionId,document_id,file_path)
         console.log(questions)
         return {id:session.id}
     }

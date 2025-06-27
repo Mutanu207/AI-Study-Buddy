@@ -23,7 +23,7 @@ import { updateUsername, logoutCurrentUser } from '../serivce/api';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 
-const pages = [
+const pages = [ //pages buttons
   { name: "Home", path: "/starter" },
   { name: "Dashboard", path: "/dashboard" },
   { name: "Sessions", path: "/sessions" },
@@ -80,9 +80,9 @@ function Navbar(props) {
  
 const handleProfileUpdate = async () => {
   try{
-    const response = await updateUsername(editUsername)
+    const response = await updateUsername(editUsername) //response retuns new username
     props.updateUsername(response.updatedName.newUsername)// name was not appering because i was not picking the json data correctly//
-     setProfileOpen(false);
+     setProfileOpen(false); //close the dialog box
     setNotification({
         open:true,
         message:response.message,
@@ -109,7 +109,7 @@ const handleProfileUpdate = async () => {
       });
       setTimeout(()=>{
         navigate("/login")
-      },1000)
+      },1000) //Since im navigating to login no need to clode dialog like the otion to edit username
     }
      catch(error){
       setNotification({
@@ -301,12 +301,12 @@ const handleProfileUpdate = async () => {
     >
       Cancel
     </Button>
-    <Button
+    <Button // work on this after im done with mvp
   color="error"
   disabled={deleteText !== "Delete"}
     >
   Delete
-  </Button>
+  </Button> 
   </DialogActions>
   </Dialog>
 

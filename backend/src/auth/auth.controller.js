@@ -71,7 +71,7 @@ export const refreshAccessToken = (req, res) => {
 export const googleCallback = async (req, res) => {
     try {
         const googleUser=req.user;
-        console.log(googleUser)
+        //console.log(googleUser)
         if(!googleUser){
             return res.status(400).json({message: "No details provided"})
         }

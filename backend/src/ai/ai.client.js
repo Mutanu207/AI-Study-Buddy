@@ -1,10 +1,10 @@
 import axios from "axios";
-export const sendToFastApi = async (id,file_path) => {
+export const sendToFastApi = async (session_id,document_id,file_path) => {
     try {
 
         const response = await axios.post(
             "http://localhost:8000/generate",
-            {id,file_path}
+            {session_id,document_id,file_path}
         );
 
         return response.data;
