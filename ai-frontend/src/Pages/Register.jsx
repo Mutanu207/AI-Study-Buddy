@@ -5,7 +5,7 @@ import PrimaryButton from "../Components/PrimaryButton";
 import TextField from "@mui/material/TextField";
 import Link from "@mui/material/Link";
 import { Link as RouterLink } from "react-router-dom";
-function Login() {
+function Register() {
     const brandColor = "#1A1A40"; // Deep blue for the brand color
     return (
        <Box sx={{
@@ -35,10 +35,10 @@ function Login() {
                             fontWeight: 800, 
                             fontFamily: 'Playfair Display, serif',
                             mb: 1 }}>
-                Login Page
+                Register Page
             </Typography>
             <Typography variant="body1" align="center" sx={{color: '#6B7280', mb: 4}} >
-                Login and continue your learning journey with <br />
+                Start Learning Smart Today with <br />
                 <Box component="span" sx={{ color: brandColor, fontWeight: 'bold' }}>AI Study Buddy!</Box>
             </Typography>
             <Box display="flex" justifyContent="center" mt={4}>
@@ -92,16 +92,13 @@ function Login() {
                             py: 1.5, 
                             fontSize: '1rem',
                             boxShadow: `0 8px 16px -4px rgba(26, 26, 64, 0.3) `}}>
-                        Login
+                       Register
                     </PrimaryButton>
                 </Box>
                 <Box>
-                    <Typography variant="body2" align="right" sx={{ mt: 2, color: '#6B7280' }}>
-                        <Box component="span" sx={{ color: brandColor, fontWeight: 'bold', cursor: 'pointer' }}>Forgot Password?</Box>
-                    </Typography>
                     <Typography variant="body2" align="center" sx={{ mt: 2, color: '#6B7280' }}>
-                       <Link component={RouterLink} to="/register" underline="none" sx={{ color: brandColor, fontWeight: "bold" }}>
-                  Don't have an account? <Box component="span" sx={{ ml: 0.5 }}>Sign Up</Box>
+                       <Link component={RouterLink} to="/login" underline="none" sx={{ color: brandColor, fontWeight: "bold" }}>
+                  Already have an account? <Box component="span" sx={{ ml: 0.5 }}>Login</Box>
                 </Link>
                     </Typography>
                 </Box>
@@ -112,4 +109,4 @@ function Login() {
     );
 }
 
-export default Login;
+export default Register;
