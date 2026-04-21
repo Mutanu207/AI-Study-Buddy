@@ -4,9 +4,13 @@ import Container from "@mui/material/Container";
 import PrimaryButton from "../Components/PrimaryButton"; 
 import TextField from "@mui/material/TextField";
 import Link from "@mui/material/Link";
+import { GOOGLE_AUTH_URL } from "../service/api";
 import { Link as RouterLink } from "react-router-dom";
 function Login() {
     const brandColor = "#1A1A40"; // Deep blue for the brand color
+    const handleGoogleLogin = () => {
+        window.location.href = GOOGLE_AUTH_URL;
+    };
     return (
        <Box sx={{
                    minHeight: '100vh',
@@ -42,7 +46,7 @@ function Login() {
                 <Box component="span" sx={{ color: brandColor, fontWeight: 'bold' }}>AI Study Buddy!</Box>
             </Typography>
             <Box display="flex" justifyContent="center" mt={4}>
-                <PrimaryButton color="#fff" background="#ff0000" size="large"
+                <PrimaryButton color="#fff" background="#ff0000" size="large" onClick={handleGoogleLogin}
                     sx={{
                         width: '100%', 
                         textTransform: 'none',

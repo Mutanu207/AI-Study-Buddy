@@ -1,3 +1,4 @@
+import { useState } from "react";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
@@ -5,9 +6,17 @@ import PrimaryButton from "../Components/PrimaryButton";
 import TextField from "@mui/material/TextField";
 import Link from "@mui/material/Link";
 import { Link as RouterLink } from "react-router-dom";
+import registerUser from "../service/api";
 function Register() {
     const brandColor = "#1A1A40"; // Deep blue for the brand color
-    return (
+    const [user, setUser] = useState({
+        email: " ",
+        password: " ",
+    });
+    const handleRegister = async ()  => {
+        const response= await registerUser(user)
+        console.log(response)}
+return(
        <Box sx={{
                    minHeight: '100vh',
                    display: 'flex',
@@ -59,6 +68,8 @@ function Register() {
              </Box>
             <Box component="form" noValidate autoComplete="off">
                 <TextField label="Email" variant="outlined" fullWidth margin="normal" placeholder="Enter your email"
+                    value={user.email}
+                    onChange={(event) => setUser(prevValue => ({ ...prevValue, email: event.target.value }))}
                     sx={{
                         "& .MuiOutlinedInput-root": {
                             "& fieldset": {
@@ -73,6 +84,8 @@ function Register() {
                         }
                     }} />
                 <TextField label="Password" variant="outlined" fullWidth margin="normal" type="password" placeholder="Enter your password" 
+                    value={user.password}
+                    onChange={(event) => setUser(prevValue => ({ ...prevValue, password: event.target.value }))}
                     sx={{
                         "& .MuiOutlinedInput-root": {
                             "& fieldset": {
@@ -87,7 +100,7 @@ function Register() {
                         }
                     }} />
                 <Box display="flex" justifyContent="center" mt={2}>
-                    <PrimaryButton color="#fff" background= {brandColor} size="large" 
+                    <PrimaryButton color="#fff" background= {brandColor} size="large" onClick={handleRegister}
                     sx={{ width: '100%', 
                             py: 1.5, 
                             fontSize: '1rem',
