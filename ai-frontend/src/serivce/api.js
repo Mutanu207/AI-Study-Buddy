@@ -9,3 +9,12 @@ export const registerUser = (userData) => {
         console.error("Error registering user:", error);     
     }
 }
+    export const loginUser = (userData) => {
+        try{
+            const result = axios.post("/api/auth/login", userData);
+            return result.data; //output we get ftom the backend api//
+        }
+        catch(error){
+            console.error("Error logging in user:", error);
+        }
+    }

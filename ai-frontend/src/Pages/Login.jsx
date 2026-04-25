@@ -6,11 +6,21 @@ import TextField from "@mui/material/TextField";
 import Link from "@mui/material/Link";
 import { GOOGLE_AUTH_URL } from "../service/api";
 import { Link as RouterLink } from "react-router-dom";
+import { useState } from "react";
+import { loginUser } from "../service/api";
 function Login() {
-    const brandColor = "#1A1A40"; // Deep blue for the brand color
+    const brandColor = "#1A1A40"; // Deep blue for the brand color//
+    const[user, setUser] = useState({
+        email: " ",
+        password: " ",
+    })
     const handleGoogleLogin = () => {
         window.location.href = GOOGLE_AUTH_URL;
     };
+    const handleLogin= ()=>{
+        const response= loginUser(user);
+        console.log(response);
+    }
     return (
        <Box sx={{
                    minHeight: '100vh',
@@ -63,6 +73,8 @@ function Login() {
              </Box>
             <Box component="form" noValidate autoComplete="off">
                 <TextField label="Email" variant="outlined" fullWidth margin="normal" placeholder="Enter your email"
+                    value={user.email}
+                    onChange={(event)=>{setUser(prevValue => ({...prevValue, email: event.target.value}))}}
                     sx={{
                         "& .MuiOutlinedInput-root": {
                             "& fieldset": {
@@ -77,6 +89,8 @@ function Login() {
                         }
                     }} />
                 <TextField label="Password" variant="outlined" fullWidth margin="normal" type="password" placeholder="Enter your password" 
+                    value={user.password}
+                    onChange={(event)=>{setUser(prevValue => ({...prevValue, password: event.target.value}))}}
                     sx={{
                         "& .MuiOutlinedInput-root": {
                             "& fieldset": {
@@ -91,7 +105,7 @@ function Login() {
                         }
                     }} />
                 <Box display="flex" justifyContent="center" mt={2}>
-                    <PrimaryButton color="#fff" background= {brandColor} size="large" 
+                    <PrimaryButton color="#fff" background= {brandColor} size="large" onClick={handleLogin}
                     sx={{ width: '100%', 
                             py: 1.5, 
                             fontSize: '1rem',
