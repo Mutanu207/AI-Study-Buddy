@@ -4,7 +4,7 @@ export const GOOGLE_AUTH_URL = "/api/auth/google";
 export const registerUser = (userData) => {
     try{
     const result=axios.post("/api/auth/register", userData);
-    return result.data } // return response from backend//
+    return result} // return response from backend//
     catch(error){
         console.error("Error registering user:", error);     
     }
@@ -12,7 +12,7 @@ export const registerUser = (userData) => {
     export const loginUser = (userData) => {
         try{
             const result = axios.post("/api/auth/login", userData);
-            return result.data; //output we get ftom the backend api//
+            return result; //output we get ftom the backend api//
         }
         catch(error){
             console.error("Error logging in user:", error);

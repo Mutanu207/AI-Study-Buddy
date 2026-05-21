@@ -6,12 +6,12 @@ import PrimaryButton from "../Components/PrimaryButton";
 import TextField from "@mui/material/TextField";
 import Link from "@mui/material/Link";
 import { Link as RouterLink } from "react-router-dom";
-import registerUser from "../service/api";
+import {registerUser} from "../serivce/api";
 function Register() {
     const brandColor = "#1A1A40"; // Deep blue for the brand color
     const [user, setUser] = useState({
-        email: " ",
-        password: " ",
+        email: "",
+        password: "",
     });
     const handleRegister = async ()  => {
         const response= await registerUser(user)

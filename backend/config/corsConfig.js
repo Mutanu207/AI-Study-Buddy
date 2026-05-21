@@ -1,4 +1,3 @@
-import cors from "cors";
 // allowed origins (use FRONTEND_URL or a comma-separated ALLOWED_ORIGINS in .env)
 const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
 const allowedOrigins = (process.env.ALLOWED_ORIGINS || FRONTEND_URL).split(",");

@@ -1,6 +1,6 @@
 import pkg from "pg";
-const { Pool } = pkg;
-export const pool = new Pool({
+ const { Pool } = pkg;
+const pool = new Pool({
     user: process.env.PG_USER,
     host: process.env.PG_HOST,
     database: process.env.PG_DATABASE,
@@ -13,3 +13,4 @@ pool.on("connect", () => {
 pool.on("error", (err) => {
     console.error("Database connection error:", err);
 });
+export default pool;

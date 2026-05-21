@@ -4,22 +4,22 @@ import Container from "@mui/material/Container";
 import PrimaryButton from "../Components/PrimaryButton"; 
 import TextField from "@mui/material/TextField";
 import Link from "@mui/material/Link";
-import { GOOGLE_AUTH_URL } from "../service/api";
+import { GOOGLE_AUTH_URL,loginUser} from "../serivce/api";
 import { Link as RouterLink } from "react-router-dom";
 import { useState } from "react";
-import { loginUser } from "../service/api";
 function Login() {
     const brandColor = "#1A1A40"; // Deep blue for the brand color//
     const[user, setUser] = useState({
-        email: " ",
-        password: " ",
+        email: "",
+        password: "",
     })
     const handleGoogleLogin = () => {
         window.location.href = GOOGLE_AUTH_URL;
     };
-    const handleLogin= ()=>{
-        const response= loginUser(user);
-        console.log(response);
+    const handleLogin= async ()=>{
+        const response= await loginUser(user);
+        console.log(response.data.message);
+        console.log(response.data.user);
     }
     return (
        <Box sx={{
