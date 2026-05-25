@@ -1,5 +1,7 @@
+import jwt from "jsonwebtoken";
 import {loginUser,registerUser} from "./auth.service.js";
-import generateToken from "../../utils/generateToken.js";
+import generateToken from "../utils/generateToken.js";
+import { generateRefreshToken} from "../utils/generateToken.js";
 export const register = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -13,7 +15,6 @@ export const register = async (req, res) => {
         res.status(500).json({ message: "Internal server error" });
     }
 };
-console.log(process.env.JWT_SECRET)
 export const login= async (req, res) => {
     try{
         const { email, password } = req.body;
@@ -22,11 +23,34 @@ export const login= async (req, res) => {
         } //validation to make sure that email and password has values//
         const user = await loginUser({email, password }); //we get back the email and id of the user that logged in//
         const token = generateToken(user); //we need to generate a token for the user that logged in//
-        res.status(200).json({ message: "User logged in successfully", user, token });
-        console.log(user)
-        console.log(token)
+        const refreshToken = generateRefreshToken(user); //we need to generate a refresh token for the user that logged in//
+        res.cookie(
+            "refreshToken",
+            refreshToken,
+            {
+                httpOnly: true,
+                secure: false,
+                sameSite: "strict",
+
+                maxAge: 7 * 24 * 60 * 60 * 1000
+            }
+        );
+        res.status(200).json({ message: "User logged in successfully", user, token});
     } catch (error) {
         console.error("Error in login controller:", error);
         res.status(500).json({ message: "Internal server error" });
     }
 }
+export const refreshAccessToken = (req, res) => {
+    try {
+        const refreshToken = req.cookies.refreshToken;
+        if (!refreshToken) {
+            return res.status(401).json({ message: "No refresh token provided" });
+        }
+        const decoded= jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+        const accessToken = generateToken({ id: decoded.id});
+        res.status(200).json({ accessToken });}
+        catch(error){
+            console.error("Error refreshing access token:", error);
+            res.status(401).json({ message: "Invalid refresh token" });
+        }}

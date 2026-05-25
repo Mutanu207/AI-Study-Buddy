@@ -1,4 +1,4 @@
-import pool from "../../config/dbConfig.js";
+import pool from "../config/dbConfig.js";
 //find if a user exists
 export const findUserByEmail = async (email) => {
     const result= await pool.query("SELECT * FROM users WHERE email = $1", [email]);    

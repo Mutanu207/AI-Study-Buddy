@@ -18,9 +18,11 @@ function Login() {
     };
     const handleLogin= async ()=>{
         const response= await loginUser(user);
-        console.log(response.data.message);
-        console.log(response.data.user);
+        localStorage.setItem(
+        "token",
+        response.data.token);
     }
+    
     return (
        <Box sx={{
                    minHeight: '100vh',
