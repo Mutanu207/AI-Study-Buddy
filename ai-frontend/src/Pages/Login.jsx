@@ -20,7 +20,7 @@ function Login() {
         const response= await loginUser(user);
         localStorage.setItem(
         "token",
-        response.data.token);
+        response.token);
     }
     
     return (

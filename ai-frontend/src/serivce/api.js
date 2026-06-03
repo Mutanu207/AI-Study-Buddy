@@ -1,21 +1,47 @@
 import axios from "axios";
 export const GOOGLE_AUTH_URL = "/api/auth/google";
-//sending a req to the backend to register a user//
-export const registerUser = (userData) => {
-    try{
-    const result=axios.post("/api/auth/register", userData);
-    return result} // return response from backend//
-    catch(error){
-        console.error("Error registering user:", error);     
+//creating a custom axios instance to handle API requests with base URL and token management//
+const api= axios.create({
+    baseURL: "/api",
+    withCredentials: true, // Include cookies in requests for authentication
+});
+api.interceptors.request.use((config) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
     }
-}
-    export const loginUser = (userData) => {
-        try{
-            const result = axios.post("/api/auth/login", userData);
-            return result; //output we get ftom the backend api//
+    return config;
+}, error => {
+    return Promise.reject(error);
+});
+
+api.interceptors.response.use((response) => response
+, async (error) => {
+    const originalRequest = error.config;
+    if (error.response?.status === 401 && !originalRequest._retry) {
+        originalRequest._retry = true;
+        try {
+            const response = await api.post("/auth/refresh-token");
+            const newToken = response.data.token;
+            localStorage.setItem("token", newToken);
+            originalRequest.headers["Authorization"] = `Bearer ${newToken}`;
+            return api(originalRequest);
         }
-        catch(error){
-            console.error("Error logging in user:", error);
+        catch (refreshError) {
+            localStorage.removeItem("token");
+            window.location.href = "/login";
+            window.location.reject(refreshError);
         }
+
     }
-    
+    return Promise.reject(error);
+});
+export const registerUser = async (user) => {
+        const response = await api.post("/auth/register", user);
+        return response.data;
+    }
+   
+export const loginUser = async (user) => {
+   
+        const response = await api.post("/auth/login", user);
+        return response.data;}
