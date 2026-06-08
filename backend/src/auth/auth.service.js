@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import {findUserByEmail, createUser} from "./auth.model.js";
+import {findUserByEmail, createUser, findUserByGoogleId, createGoogleUser} from "./auth.model.js";
 export const registerUser = async ({email, password }) => {
     try{
         const editEmail=email.toLowerCase().trim(); //to make sure that email is in a standard format//
@@ -27,3 +27,17 @@ export const registerUser = async ({email, password }) => {
             throw error;
         } 
     }
+    export const googleLogin= async ({google_id,email,username}) => {
+        try{
+            const existingUser= await findUserByGoogleId(google_id);
+            if(existingUser){
+                return {email:existingUser.email, id:existingUser.id};
+            }//check if user exists in the db, if yes return emai and id we get back frm the functin//
+            if(!existingUser){
+                const newGoogleUser= await createGoogleUser(google_id,email,username)
+                return {email:newGoogleUser.email, id:newGoogleUser.id}
+            }} //if user is new add them t db,and return emai and id t be sent to cntrer functin
+            catch(error){
+                throw error
+            }
+        }

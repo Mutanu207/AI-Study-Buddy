@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import {loginUser,registerUser} from "./auth.service.js";
+import {googleLogin, loginUser,registerUser} from "./auth.service.js";
 import generateToken from "../utils/generateToken.js";
 import { generateRefreshToken} from "../utils/generateToken.js";
 export const register = async (req, res) => {
@@ -67,3 +67,34 @@ export const refreshAccessToken = (req, res) => {
                  return res.status(500).json({ message: "Internal server error" });
 
         }}
+
+export const googleCallback = async (req, res) => {
+    try {
+        const googleUser=req.user;
+        console.log(googleUser)
+        if(!googleUser){
+            return res.status(400).json({message: "No details provided"})
+        }
+        const user= await googleLogin({
+            google_id:googleUser.id,
+            email: googleUser.email,
+            username: googleUser.displayName})
+        const token= generateToken(user)
+        const googleRefreshToken=generateRefreshToken(user)
+        res.cookie(
+            "refreshToken",
+            refreshToken,
+            {
+                httpOnly: true,
+                secure: false,
+                sameSite: "strict",
+
+                maxAge: 7 * 24 * 60 * 60 * 1000
+            }
+        );
+        res.status(200).json({ message: "User logged in successfully", user, token}); 
+
+    } catch (error) {
+        console.error("Error in Google callback:", error);
+        res.status(500).json({ message: "Internal server error" });
+    }}
