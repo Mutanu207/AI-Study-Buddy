@@ -7,21 +7,46 @@ import Link from "@mui/material/Link";
 import { GOOGLE_AUTH_URL,loginUser} from "../serivce/api";
 import { Link as RouterLink } from "react-router-dom";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
 function Login() {
     const brandColor = "#1A1A40"; // Deep blue for the brand color//
+    const navigate= useNavigate();
     const[user, setUser] = useState({
         email: "",
         password: "",
+    })
+    const [notification, setNotfication] =useState({
+        open: false,
+        message: "",
+        severity: "success"
     })
     const handleGoogleLogin = () => {
         window.location.href = GOOGLE_AUTH_URL;
     };
     const handleLogin= async ()=>{
+        try{
         const response= await loginUser(user);
         localStorage.setItem(
         "token",
         response.token);
-    }
+        setNotfication({
+            open: true,
+            message: response.message,
+            severity: "success"
+        });
+        setTimeout(() => {
+            navigate("/starter");
+        }, 1500);
+        }
+        catch(error){
+            setNotfication({
+                open: true,
+                message: error.response?.data?.message || "Login failed. Please try again.",
+                severity: "error"
+            });
+        }}
     
     return (
        <Box sx={{
@@ -128,6 +153,21 @@ function Login() {
             </Box>
         </Container>
        </Box>
+       <Snackbar
+           open={notification.open}
+           autoHideDuration={3000}
+           onClose={() => setNotfication(prev => ({ ...prev, open: false }))}
+           anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+       >
+           <Alert
+               severity={
+                   notification.severity
+               }
+               variant="filled">
+           
+               {notification.message} 
+           </Alert>
+       </Snackbar>
          </Box>
     );
 }

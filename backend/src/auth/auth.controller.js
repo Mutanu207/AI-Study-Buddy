@@ -77,13 +77,13 @@ export const googleCallback = async (req, res) => {
         }
         const user= await googleLogin({
             google_id:googleUser.id,
-            email: googleUser.email,
+            email: googleUser.emails[0].value,
             username: googleUser.displayName})
         const token= generateToken(user)
         const googleRefreshToken=generateRefreshToken(user)
         res.cookie(
             "refreshToken",
-            refreshToken,
+            googleRefreshToken,
             {
                 httpOnly: true,
                 secure: false,
@@ -92,7 +92,7 @@ export const googleCallback = async (req, res) => {
                 maxAge: 7 * 24 * 60 * 60 * 1000
             }
         );
-        res.status(200).json({ message: "User logged in successfully", user, token}); 
+        res.status(200).json({ message: "Google user logged in successfully", user, token}); 
 
     } catch (error) {
         console.error("Error in Google callback:", error);

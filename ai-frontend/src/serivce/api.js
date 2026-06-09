@@ -5,6 +5,7 @@ const api= axios.create({
     baseURL: "/api",
     withCredentials: true, // Include cookies in requests for authentication
 });
+//runs before the req is sent to backend//
 api.interceptors.request.use((config) => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -24,8 +25,8 @@ api.interceptors.response.use((response) => response
             const response = await api.post("/auth/refresh-token");
             const newToken = response.data.token;
             localStorage.setItem("token", newToken);
-            originalRequest.headers["Authorization"] = `Bearer ${newToken}`;
-            return api(originalRequest);
+            originalRequest.headers["Authorization"] = `Bearer ${newToken}`;//updates failed req with new req header that has the new token//
+            return api(originalRequest); //run the req that had failed with the new token//
         }
         catch (refreshError) {
             localStorage.removeItem("token");

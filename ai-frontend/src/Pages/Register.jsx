@@ -6,16 +6,45 @@ import PrimaryButton from "../Components/PrimaryButton";
 import TextField from "@mui/material/TextField";
 import Link from "@mui/material/Link";
 import { Link as RouterLink } from "react-router-dom";
-import {registerUser} from "../serivce/api";
+import {registerUser, GOOGLE_AUTH_URL} from "../serivce/api";
+import { useNavigate } from "react-router-dom";
+import  Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
 function Register() {
     const brandColor = "#1A1A40"; // Deep blue for the brand color
+    const navigate= useNavigate()
     const [user, setUser] = useState({
         email: "",
         password: "",
     });
+    const [notification, setNotfication] =useState({
+        open: false,
+        message: "",
+        severity: "success"
+    })
     const handleRegister = async ()  => {
+        try{
         const response= await registerUser(user)
-        console.log(response)}
+        console.log(response)
+        setNotfication({
+            open: true,
+            message: response.message,
+            severity: "success"
+        });
+        setTimeout(() => {
+        navigate("/login");}, 1500)
+    }
+    catch(error){
+        console.error(error)
+        setNotfication({
+            open: true,
+            message: error.response?.data?.message || "Registration failed. Please try again.",
+            severity: "error"
+        });
+    }}
+    const handleGoogleRegister = () => {
+        window.location.href = GOOGLE_AUTH_URL;
+    }
 return(
        <Box sx={{
                    minHeight: '100vh',
@@ -51,7 +80,7 @@ return(
                 <Box component="span" sx={{ color: brandColor, fontWeight: 'bold' }}>AI Study Buddy!</Box>
             </Typography>
             <Box display="flex" justifyContent="center" mt={4}>
-                <PrimaryButton color="#fff" background="#ff0000" size="large"
+                <PrimaryButton color="#fff" background="#ff0000" size="large" onClick={handleGoogleRegister}
                     sx={{
                         width: '100%', 
                         textTransform: 'none',
@@ -118,7 +147,18 @@ return(
             </Box>
         </Container>
        </Box>
-         </Box>
+       
+       <Snackbar
+            open={notification.open}
+            autoHideDuration={3000}
+            onClose={() => setNotfication(prev => ({ ...prev, open: false }))}
+            anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        >
+            <Alert severity={notification.severity} variant="filled">
+                {notification.message} 
+            </Alert>
+        </Snackbar>
+       </Box>
     );
 }
 
