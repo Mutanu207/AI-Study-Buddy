@@ -12,7 +12,7 @@ export const register = async (req, res) => {
         res.status(201).json({ message: "User registered successfully", userDetails });
     } catch (error) {
         console.error("Error in register controller:", error);
-        res.status(500).json({ message: "Internal server error" });
+        res.status(500).json({ message: error.message });
     }
 };
 export const login= async (req, res) => {
@@ -38,7 +38,7 @@ export const login= async (req, res) => {
         res.status(200).json({ message: "User logged in successfully", user, token});
     } catch (error) {
         console.error("Error in login controller:", error);
-        res.status(500).json({ message: "Internal server error" });
+        res.status(401).json({ message: error.message });
     }
 }
 export const refreshAccessToken = (req, res) => {
@@ -92,9 +92,9 @@ export const googleCallback = async (req, res) => {
                 maxAge: 7 * 24 * 60 * 60 * 1000
             }
         );
-        res.status(200).json({ message: "Google user logged in successfully", user, token}); 
+        res.redirect("http://localhost:5173/auth-success?token=${token}");
 
     } catch (error) {
         console.error("Error in Google callback:", error);
-        res.status(500).json({ message: "Internal server error" });
+        res.status(500).json({ message: "Google login failed" });
     }}

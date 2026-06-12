@@ -10,6 +10,11 @@ import {registerUser, GOOGLE_AUTH_URL} from "../serivce/api";
 import { useNavigate } from "react-router-dom";
 import  Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
+import { validateRegister } from "../utils/authValidation";
+import InputAdornment from "@mui/material/InputAdornment";
+import IconButton from "@mui/material/IconButton";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 function Register() {
     const brandColor = "#1A1A40"; // Deep blue for the brand color
     const navigate= useNavigate()
@@ -22,10 +27,19 @@ function Register() {
         message: "",
         severity: "success"
     })
+    const [showPassword, setShowPassword] = useState(false);
     const handleRegister = async ()  => {
         try{
+        const validationError = validateRegister(user);
+        if (validationError) {
+            setNotfication({
+                open: true,
+                message: validationError,
+                severity: "error"
+            });
+            return;
+        }
         const response= await registerUser(user)
-        console.log(response)
         setNotfication({
             open: true,
             message: response.message,
@@ -112,9 +126,20 @@ return(
                             },
                         }
                     }} />
-                <TextField label="Password" variant="outlined" fullWidth margin="normal" type="password" placeholder="Enter your password" 
+                <TextField label="Password" variant="outlined" fullWidth margin="normal" type={showPassword ? "text" : "password"} placeholder="Enter your password" 
                     value={user.password}
                     onChange={(event) => setUser(prevValue => ({ ...prevValue, password: event.target.value }))}
+                    InputProps={{
+                        endAdornment: (
+                            <InputAdornment position="end">
+                                <IconButton
+                                    onClick={() => setShowPassword(!showPassword)}
+                                >
+                                    {showPassword ? <Visibility /> : <VisibilityOff />}
+                                </IconButton>
+                            </InputAdornment>
+                        )
+                    }}
                     sx={{
                         "& .MuiOutlinedInput-root": {
                             "& fieldset": {

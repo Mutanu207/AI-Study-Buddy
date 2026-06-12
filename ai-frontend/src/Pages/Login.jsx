@@ -10,6 +10,11 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
+import { validateLogin } from "../utils/authValidation";
+import InputAdornment from "@mui/material/InputAdornment";
+import IconButton from "@mui/material/IconButton";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
 function Login() {
     const brandColor = "#1A1A40"; // Deep blue for the brand color//
     const navigate= useNavigate();
@@ -17,21 +22,31 @@ function Login() {
         email: "",
         password: "",
     })
-    const [notification, setNotfication] =useState({
+    const [notification, setNotification] =useState({
         open: false,
         message: "",
         severity: "success"
     })
+    const [showPassword, setShowPassword] = useState(false);
     const handleGoogleLogin = () => {
         window.location.href = GOOGLE_AUTH_URL;
     };
     const handleLogin= async ()=>{
         try{
+        const validationError = validateLogin(user);
+        if (validationError) {
+            setNotification({
+                open: true,
+                message: validationError,
+                severity: "error"
+            });
+            return;
+        }
         const response= await loginUser(user);
         localStorage.setItem(
         "token",
         response.token);
-        setNotfication({
+        setNotification({
             open: true,
             message: response.message,
             severity: "success"
@@ -41,12 +56,16 @@ function Login() {
         }, 1500);
         }
         catch(error){
-            setNotfication({
+            setNotification({
                 open: true,
                 message: error.response?.data?.message || "Login failed. Please try again.",
                 severity: "error"
             });
-        }}
+            setTimeout(() => {
+                navigate("/login");
+            }, 1500);
+        }
+    }
     
     return (
        <Box sx={{
@@ -115,9 +134,20 @@ function Login() {
                             },
                         }
                     }} />
-                <TextField label="Password" variant="outlined" fullWidth margin="normal" type="password" placeholder="Enter your password" 
+                <TextField label="Password" variant="outlined" fullWidth margin="normal" type={showPassword ? "text" : "password"} placeholder="Enter your password" 
                     value={user.password}
                     onChange={(event)=>{setUser(prevValue => ({...prevValue, password: event.target.value}))}}
+                    InputProps={{
+                        endAdornment: (
+                            <InputAdornment position="end">
+                                <IconButton
+                                    onClick={() => setShowPassword(!showPassword)}
+                                >
+                                    {showPassword ? <Visibility /> : <VisibilityOff />}
+                                </IconButton>
+                            </InputAdornment>
+                        )
+                    }}
                     sx={{
                         "& .MuiOutlinedInput-root": {
                             "& fieldset": {
@@ -156,7 +186,7 @@ function Login() {
        <Snackbar
            open={notification.open}
            autoHideDuration={3000}
-           onClose={() => setNotfication(prev => ({ ...prev, open: false }))}
+           onClose={() => setNotification(prev => ({ ...prev, open: false }))}
            anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
        >
            <Alert

@@ -32,7 +32,11 @@ export const registerUser = async ({email, password }) => {
             const existingUser= await findUserByGoogleId(google_id);
             if(existingUser){
                 return {email:existingUser.email, id:existingUser.id};
-            }//check if user exists in the db, if yes return emai and id we get back frm the functin//
+            }//check if user exists in the db, if yes return email and id we get back frm the functin//
+            const localUser= await findUserByEmail(email);
+            if(localUser){
+                const upadatedLocalUser= await updateUser(google_id,email)
+                return {email:upadatedLocalUser.email, id:upadatedLocalUser.id}}//if user exists but has not logged in with google before, we update the user details with google id and return email and id//
            const newGoogleUser= await createGoogleUser(google_id,email,username)
                 return {email:newGoogleUser.email, id:newGoogleUser.id}
             } //if user is new add them t db,and return emai and id t be sent to cntrer functin

@@ -17,3 +17,7 @@ export const findUserByGoogleId = async (google_id) => {
     const result = await pool.query("SELECT * FROM users WHERE google_id = $1", [google_id]);
     return result.rows[0];
 }
+export const updateUser = async (google_id,email) => {
+    const result = await pool.query("UPDATE users SET google_id = $1 WHERE email = $2 RETURNING id, email", [google_id, email]);
+    return result.rows[0];
+}
