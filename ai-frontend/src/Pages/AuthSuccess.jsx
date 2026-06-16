@@ -13,5 +13,5 @@ function AuthSuccess() {
         };
     },[navigate]);
     return (
-        <div><h2>Signing you in...</h2></div>)};
+        <div><h2>Signing you in...</h2></div>)}
 export default AuthSuccess;

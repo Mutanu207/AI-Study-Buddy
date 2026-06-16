@@ -46,3 +46,6 @@ export const loginUser = async (user) => {
    
         const response = await api.post("/auth/login", user);
         return response.data;}
+export const fetchUser = async () => { 
+        const response = await api.get("/user/me");
+        return response.data; }
