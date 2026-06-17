@@ -6,7 +6,7 @@ import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import Button from "@mui/material/Button";
 import PrimaryButton from "../Components/PrimaryButton";
-import fetchUser from "../serivce/api";
+import { fetchUser } from "../serivce/api";
 
 function StarterPage() {
     const [files, setFiles] = useState(null);
@@ -42,7 +42,8 @@ function StarterPage() {
                 flexDirection: 'column',
                 my:6
             }}>
-        <Typography variant="h4" align="center" sx={{ mt: 4 }}>
+        <Typography variant="h4" align="center" sx={{ mt: 4, fontWeight: 'bold', fontFamily: 'Playfair Display, serif' }}>
+            
             Hey There {username}!
         </Typography>
         <Paper {...getRootProps()}

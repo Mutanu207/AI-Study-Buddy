@@ -120,7 +120,7 @@ function Navbar(props) {
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar>{props.user.charAt(0)}</Avatar>  
+                <Avatar>{props.user?.charAt(0) || "U"}</Avatar>  
               </IconButton>
             </Tooltip>
             <Menu

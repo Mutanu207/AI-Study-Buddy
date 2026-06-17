@@ -23,7 +23,7 @@ api.interceptors.response.use((response) => response
         originalRequest._retry = true;
         try {
             const response = await api.post("/auth/refresh-token");
-            const newToken = response.data.token;
+            const newToken = response.data.accessToken;
             localStorage.setItem("token", newToken);
             originalRequest.headers["Authorization"] = `Bearer ${newToken}`;//updates failed req with new req header that has the new token//
             return api(originalRequest); //run the req that had failed with the new token//
@@ -31,7 +31,7 @@ api.interceptors.response.use((response) => response
         catch (refreshError) {
             localStorage.removeItem("token");
             window.location.href = "/login";
-            window.location.reject(refreshError);
+            return Promise.reject(refreshError);
         }
 
     }
@@ -48,4 +48,5 @@ export const loginUser = async (user) => {
         return response.data;}
 export const fetchUser = async () => { 
         const response = await api.get("/user/me");
+        console.log("Login response:", response.data);
         return response.data; }
