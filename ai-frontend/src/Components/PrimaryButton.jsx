@@ -4,6 +4,7 @@ function PrimaryButton(props){
         <Button variant ="contained"
                 size={props.size}
                 onClick={props.onClick}
+                disabled={props.disabled}
             sx={{
                 background:props.background,
                border: "2px $background solid",

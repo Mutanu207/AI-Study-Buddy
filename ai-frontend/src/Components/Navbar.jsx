@@ -11,8 +11,15 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
+import AdbIcon from '@mui/icons-material/Adb';
+import { useNavigate } from "react-router-dom";
 
-const pages = ['Home', 'Dashboard', 'Sessions', 'About'];
+const pages = [
+  { name: "Home", path: "/starter" },
+  { name: "Dashboard", path: "/dashboard" },
+  { name: "Sessions", path: "/sessions" },
+  { name: "About", path: "/about" }
+];
 const settings = ['Profile', 'Logout' , 'Delete Account'];
 
 function Navbar(props) {
@@ -33,7 +40,7 @@ function Navbar(props) {
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
-
+  const navigate = useNavigate();
   return (
     <AppBar position="static" sx={{ backgroundColor: '#1A1A40' }}>
       <Container maxWidth="xl">
@@ -82,13 +89,17 @@ function Navbar(props) {
               onClose={handleCloseNavMenu}
               sx={{ display: { xs: 'block', md: 'none' } }}
             >
-              {pages.map((page) => (
-                <MenuItem key={page} onClick={handleCloseNavMenu}>
-                  <Typography sx={{ textAlign: 'center' }}>{page}</Typography>
+             {pages.map((page) => (
+                <MenuItem key={page.name} onClick={() => {
+                                          navigate(page.path);
+                                          handleCloseNavMenu();
+                                                            }}>
+                  <Typography sx={{ textAlign: 'center' }}>{page.name}</Typography>
                 </MenuItem>
               ))}
             </Menu>
           </Box>
+          <AdbIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
           <Typography
             variant="h5"
             noWrap
@@ -98,8 +109,9 @@ function Navbar(props) {
               mr: 2,
               display: { xs: 'flex', md: 'none' },
               flexGrow: 1,
-              fontFamily: 'Playfair Display, serif',
+              fontFamily: 'monospace',
               fontWeight: 700,
+              letterSpacing: '.3rem',
               color: 'inherit',
               textDecoration: 'none',
             }}
@@ -109,11 +121,14 @@ function Navbar(props) {
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
             {pages.map((page) => (
               <Button
-                key={page}
-                onClick={handleCloseNavMenu}
+                key={page.name}
+                onClick={() => {
+                          navigate(page.path);
+                          handleCloseNavMenu();
+                            }}
                 sx={{ my: 2, color: 'white', display: 'block' }}
               >
-                {page}
+                {page.name}
               </Button>
             ))}
           </Box>

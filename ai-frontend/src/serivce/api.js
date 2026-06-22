@@ -48,5 +48,16 @@ export const loginUser = async (user) => {
         return response.data;}
 export const fetchUser = async () => { 
         const response = await api.get("/user/me");
-        console.log("Login response:", response.data);
         return response.data; }
+export const uploadPdf = async (file) => {
+    const formData = new FormData();
+
+    formData.append("pdf", file);
+
+    const response = await api.post(
+        "/documents/upload",
+        formData
+    );
+    return response.data; // we need t0 return d0cId//
+   
+};

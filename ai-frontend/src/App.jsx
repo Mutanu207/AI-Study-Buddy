@@ -5,7 +5,9 @@ import StarterPage from "./Pages/StarterPage";
 import AuthSuccess from "./Pages/AuthSuccess";
 import {Routes, Route} from "react-router-dom";
 import ProtectedRoute from "./serivce/ProtectedRoute";
-import Navbar from "./Components/Navbar";
+import Sessions from "./Pages/Sessions";
+import Dashboard from "./Pages/Dashboard"
+import About from "./Pages/About"
 function App() {
   return (
     <Routes>
@@ -14,7 +16,9 @@ function App() {
       <Route path="/register" element={<Register />} />
        <Route path="/auth-success" element={<AuthSuccess />} />
       <Route path="/starter" element={<ProtectedRoute><StarterPage /></ProtectedRoute>} />
-     
+      <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+        <Route path="/sessions" element={<ProtectedRoute><Sessions /></ProtectedRoute>} /> 
+        <Route path="/about" element={<ProtectedRoute><About /></ProtectedRoute>} />
     </Routes>
   );
 };

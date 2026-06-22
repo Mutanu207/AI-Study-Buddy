@@ -1,36 +1,41 @@
 import Typography from "@mui/material/Typography";
 import  Navbar  from "../Components/Navbar";
-import {useState,useEffect} from "react";
+import {useState} from "react";
 import { useDropzone } from 'react-dropzone';
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import Button from "@mui/material/Button";
 import PrimaryButton from "../Components/PrimaryButton";
-import { fetchUser } from "../serivce/api";
+import { useUsername } from "../hooks/useUsername";
+import { uploadPdf } from "../serivce/api";
 
 function StarterPage() {
     const [files, setFiles] = useState(null);
-    const [username, setUsername] = useState("");
-    useEffect(() => {
-            const fetchUsername = async () => {
-        try {
-            const data = await fetchUser();
-            console.log('Fetched username:', data);
-            setUsername(data.username);
-        } catch (error) {
-            console.error('Error fetching username:', error);
-        } 
-    };
-    fetchUsername();
-    }, []);
-    
+    const [docId, setDocId]= useState(null)
+    const { username, loading } = useUsername();
     const onDrop = (acceptedFiles) => {
         setFiles(acceptedFiles[0]);
     }
+
     const {getRootProps, getInputProps, isDragActive} = 
     useDropzone({onDrop,
                     accept:{'application/pdf': ['.pdf']},
                     multiple: false});
+    
+    const handlePdfSubmit= async ()=> {
+        if(!files) {
+            return alert("Input PDF")
+        }
+        try{
+        const response= await uploadPdf(files)     
+        setDocId(response.id)   
+        if(docId) setFiles(null)}
+       catch(error){
+        console.error(error)
+    }}
+
+    if (loading) return  <Typography variant="h6" align="center" sx={{ mt: 4 }}>Loading...</Typography>;
+   
     return(
         <> 
         <Navbar user={username} /> 
@@ -64,8 +69,11 @@ function StarterPage() {
             ) : (
                 <Typography variant="h6">Drag 'n' drop a PDF file here, or click to select a file</Typography>
             )} </Paper>
+            {!docId &&(
+                <>
         <Button variant="contained" 
                 color="error" 
+                disabled={!files}
                 sx={{ mt: 4, mb: 2 }}  
                 onClick={() => setFiles(null)}>
             Remove File
@@ -73,12 +81,26 @@ function StarterPage() {
         <PrimaryButton size="large" background="#1A1A40" color="#fff" 
                         sx={{ mt: 4 }} 
                         disabled={!files}
-                        onClick={() => alert("File uploaded successfully!")}>
+                        onClick={handlePdfSubmit}>
             Upload PDF
         </PrimaryButton>
+        </>
+        )}
+        { docId && (
+            <>
+                <PrimaryButton size="large" background="#1A1A40" color="#fff" 
+                        sx={{ mt: 10 }} 
+                        disabled={!docId}
+                        >
+            Start Session
+        </PrimaryButton>
+        </>
+        )}
+    
         </Box>
         </>
 
     )
 }
 export default StarterPage;
+
