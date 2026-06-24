@@ -13,6 +13,12 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
 import { useNavigate } from "react-router-dom";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import TextField from '@mui/material/TextField';
+import { useState } from 'react';
 
 const pages = [
   { name: "Home", path: "/starter" },
@@ -23,9 +29,17 @@ const pages = [
 const settings = ['Profile', 'Logout' , 'Delete Account'];
 
 function Navbar(props) {
+  //use states
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
-
+  const [logoutOpen, setLogoutOpen] = React.useState(false);
+  const [deleteOpen, setDeleteOpen]= React.useState(false)
+  const [deleteText, setDeleteText]= useState("")
+  const [profileOpen, setProfileOpen] = React.useState(false);
+  const [editUsername, setEditUsername] = React.useState("");
+  
+  
+  //functions
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
   };
@@ -41,7 +55,24 @@ function Navbar(props) {
     setAnchorElUser(null);
   };
   const navigate = useNavigate();
+  const handleSettingClick = (setting) => {
+
+  handleCloseUserMenu();
+
+  if (setting === "Logout") {
+    setLogoutOpen(true);
+  }
+  if(setting == "Delete Account"){
+    setDeleteOpen(true) // this state when true opens the delete dialog box, set it at false first//
+  }
+  if (setting === "Profile") {
+    setEditUsername(props.user || "");
+    setProfileOpen(true);
+}
+
+};
   return (
+    <>
     <AppBar position="static" sx={{ backgroundColor: '#1A1A40' }}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
@@ -155,7 +186,8 @@ function Navbar(props) {
               onClose={handleCloseUserMenu}
             >
               {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                <MenuItem  key={setting}
+                            onClick={() => handleSettingClick(setting)}>
                   <Typography sx={{ textAlign: 'center' }}>{setting}</Typography>
                 </MenuItem>
               ))}
@@ -164,6 +196,109 @@ function Navbar(props) {
         </Toolbar>
       </Container>
     </AppBar>
+    <Dialog
+        open={logoutOpen}
+        onClose={() => setLogoutOpen(false)}
+      >
+    <DialogTitle>
+    Logout
+    </DialogTitle>
+
+    <DialogContent>
+    Are you sure you want to logout?
+    </DialogContent>
+
+    <DialogActions>
+
+    <Button
+      onClick={() => setLogoutOpen(false)}
+    >
+      Cancel
+    </Button>
+
+    <Button
+      color="error"
+    >
+      Logout
+    </Button>
+
+  </DialogActions>
+  </Dialog>
+  
+  <Dialog
+        open={deleteOpen}
+        onClose={() => setDeleteOpen(false)}
+      >
+    <DialogTitle>
+    Delete Account
+    </DialogTitle>
+
+    <DialogContent>
+      <Typography color="error"> Are you sure you want to Delete your account? All progress will be lost.</Typography>
+    
+    </DialogContent>
+
+    <DialogActions>
+      <label>Type <span style={{fontWeight: "bold"}}>Delete</span> in the textbox</label>
+      <TextField id="outlined-basic" label=" Account Delete Confirmation" variant="outlined" value={deleteText}
+      fullWidth margin="normal" placeholder="Delete"
+                    onChange={(event)=>{setDeleteText(event.target.value)}}
+                    />
+
+    <Button
+      onClick={() => setDeleteOpen(false)}
+    >
+      Cancel
+    </Button>
+    <Button
+  color="error"
+  disabled={deleteText !== "Delete"}
+    >
+  Delete
+  </Button>
+  </DialogActions>
+  </Dialog>
+  <Dialog
+  open={profileOpen}
+  onClose={() => setProfileOpen(false)}
+>
+
+  <DialogTitle>
+    Update Profile
+  </DialogTitle>
+
+  <DialogContent>
+
+    <TextField
+      label="Username"
+      fullWidth
+      margin="normal"
+      value={editUsername}
+      onChange={(event) => {
+        setEditUsername(event.target.value);
+      }}
+    />
+
+  </DialogContent>
+
+  <DialogActions>
+
+    <Button
+      onClick={() => setProfileOpen(false)}
+    >
+      Cancel
+    </Button>
+
+    <Button
+      disabled={!editUsername.trim()}
+    >
+      Save
+    </Button>
+
+  </DialogActions>
+
+</Dialog>
+</>
   );
 }
 export default Navbar;
