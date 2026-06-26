@@ -19,6 +19,9 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import TextField from '@mui/material/TextField';
 import { useState } from 'react';
+import { updateUsername, logoutCurrentUser } from '../serivce/api';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
 
 const pages = [
   { name: "Home", path: "/starter" },
@@ -37,6 +40,11 @@ function Navbar(props) {
   const [deleteText, setDeleteText]= useState("")
   const [profileOpen, setProfileOpen] = React.useState(false);
   const [editUsername, setEditUsername] = React.useState("");
+  const [notification, setNotification] = useState({
+    open:false,
+    message:"",
+    severity:"sucess"
+  })
   
   
   //functions
@@ -54,11 +62,11 @@ function Navbar(props) {
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
+
   const navigate = useNavigate();
+
   const handleSettingClick = (setting) => {
-
   handleCloseUserMenu();
-
   if (setting === "Logout") {
     setLogoutOpen(true);
   }
@@ -68,9 +76,51 @@ function Navbar(props) {
   if (setting === "Profile") {
     setEditUsername(props.user || "");
     setProfileOpen(true);
-}
+}};
+ 
+const handleProfileUpdate = async () => {
+  try{
+    const response = await updateUsername(editUsername)
+    props.updateUsername(response.updatedName.newUsername)
+     setProfileOpen(false);
+    setNotification({
+        open:true,
+        message:response.message,
+        severity:"success"
+      });
+  }
+  catch(error){
+    setNotification({
+        open:true, 
+        message:error.response?.data?.message || "Username update failed",
+        severity:"error"
+      })
+    console.error(error)
+  } }
+//function to call the api that logs out the user
+  const logoutUser = async () => {
+    try{
+      const result = await logoutCurrentUser()
+      localStorage.removeItem("token");
+      setNotification({
+        open:true,
+        message:result.message,
+        severity:"success"
+      });
+      setTimeout(()=>{
+        navigate("/login")
+      },1000)
+    }
+     catch(error){
+      setNotification({
+        open:true, 
+        message:error.response?.data?.message || "Logout Failed",
+        severity:"error"
+      })
+    console.error(error)
+  }
+  }
 
-};
   return (
     <>
     <AppBar position="static" sx={{ backgroundColor: '#1A1A40' }}>
@@ -218,6 +268,7 @@ function Navbar(props) {
 
     <Button
       color="error"
+      onClick= {logoutUser}
     >
       Logout
     </Button>
@@ -258,16 +309,17 @@ function Navbar(props) {
   </Button>
   </DialogActions>
   </Dialog>
+
   <Dialog
   open={profileOpen}
   onClose={() => setProfileOpen(false)}
 >
-
   <DialogTitle>
     Update Profile
   </DialogTitle>
 
   <DialogContent>
+    <Typography>Email: {props.email} </Typography>
 
     <TextField
       label="Username"
@@ -291,13 +343,30 @@ function Navbar(props) {
 
     <Button
       disabled={!editUsername.trim()}
+      onClick={handleProfileUpdate}
     >
-      Save
+      Update
     </Button>
 
   </DialogActions>
 
 </Dialog>
+
+<Snackbar
+           open={notification.open}
+           autoHideDuration={3000}
+           onClose={() => setNotification(prev => ({ ...prev, open: false }))}
+           anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+       >
+           <Alert
+               severity={
+                   notification.severity
+               }
+               variant="filled">
+           
+               {notification.message} 
+           </Alert>
+       </Snackbar>
 </>
   );
 }

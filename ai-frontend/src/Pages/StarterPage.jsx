@@ -12,7 +12,7 @@ import { uploadPdf } from "../serivce/api";
 function StarterPage() {
     const [files, setFiles] = useState(null);
     const [docId, setDocId]= useState(null)
-    const { username, loading } = useUsername();
+    const { username, loading,userEmail, setUsername} = useUsername();
     const onDrop = (acceptedFiles) => {
         setFiles(acceptedFiles[0]);
     }
@@ -38,7 +38,7 @@ function StarterPage() {
    
     return(
         <> 
-        <Navbar user={username} /> 
+        <Navbar user={username} email={userEmail} updateUsername={setUsername}/> 
         <Box sx={{
                 flexGrow: 1,
                 justifyContent: 'center',

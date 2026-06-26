@@ -61,3 +61,12 @@ export const uploadPdf = async (file) => {
     return response.data; // we need t0 return d0cId//
    
 };
+export const updateUsername = async (username) =>{
+    const result = await api.post("/user/update", {
+        editUsername: username
+})
+    return result.data
+}
+export const logoutCurrentUser = async () => {
+    const result = await api.get("/auth/logout")
+    return result.data}

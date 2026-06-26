@@ -3,6 +3,7 @@ import { fetchUser } from "../serivce/api";
 
 export function useUsername() {
     const [username, setUsername] = useState("");
+    const [userEmail, setUserEmail]= useState("")
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     useEffect(() => {
@@ -10,6 +11,7 @@ export function useUsername() {
             try {
                 const data = await fetchUser();
                 setUsername(data.username);
+                setUserEmail(data.email)
             } catch (error) {
                 setError(error);
             } finally {
@@ -18,5 +20,5 @@ export function useUsername() {
         };
         fetchUsername();
     }, []);
-    return { username, loading, error };
+    return { username, loading, error, userEmail, setUsername};
 }
