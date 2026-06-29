@@ -81,7 +81,7 @@ function Navbar(props) {
 const handleProfileUpdate = async () => {
   try{
     const response = await updateUsername(editUsername)
-    props.updateUsername(response.updatedName.newUsername)
+    props.updateUsername(response.updatedName.newUsername)// name was not appering because i was not picking the json data correctly//
      setProfileOpen(false);
     setNotification({
         open:true,

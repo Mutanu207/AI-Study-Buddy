@@ -46,9 +46,11 @@ export const loginUser = async (user) => {
    
         const response = await api.post("/auth/login", user);
         return response.data;}
+
 export const fetchUser = async () => { 
         const response = await api.get("/user/me");
         return response.data; }
+
 export const uploadPdf = async (file) => {
     const formData = new FormData();
 
@@ -70,3 +72,11 @@ export const updateUsername = async (username) =>{
 export const logoutCurrentUser = async () => {
     const result = await api.get("/auth/logout")
     return result.data}
+
+export const createSessions = async(docid) => {
+    const result = await api.post("/sessions/create", {
+        docId:docid
+    } )
+    console.log(result.data)
+    return result.data
+}

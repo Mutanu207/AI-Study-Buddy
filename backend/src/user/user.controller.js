@@ -11,7 +11,6 @@ export const fetchUsername = async (req, res) => {
 export const updateProfile = async (req,res) => {
     try{
         const userid= req.user.id
-        console.log(req.body);
         const {editUsername}= req.body
         const normalizedUsername=editUsername.trim()
        if(!normalizedUsername){

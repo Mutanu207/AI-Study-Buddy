@@ -14,6 +14,9 @@ export const fetchUserDetails = async (userId) => {
 
 export const profileUpdate = async(userId, username) => {
     try{
+        if(!updatedUsername){
+            throw new Error ('Updated username is not found')
+        }
         const updatedUsername = await updateUser(userId,username)
         return {newUsername:updatedUsername.user_name}
     }
