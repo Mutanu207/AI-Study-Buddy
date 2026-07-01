@@ -44,7 +44,7 @@ function StarterPage() {
         try{
             const response= await createSessions(docId)
             setUserSessions(response.id)
-            console.log(sessionsId)
+            console.log(sessionsId)// send over the message//
         }
         catch(error){
             console.error(error)
