@@ -195,19 +195,19 @@ Every major architectural decision is documented throughout the development proc
 
 ## Register Page
 
-*(Screenshot Coming Soon)*
+![Register Page](assets/images/study-buddy-RegisterPage.png)
 
 ---
 
 ## Login Page
 
-*(Screenshot Coming Soon)*
+![Login Page](assets/images/study-buddy-LoginPage.png)
 
 ---
 
 ## Starter Page
 
-*(Screenshot Coming Soon)*
+![Starter Page](assets/images/study-buddy-StarterPage.png)
 
 ---
 
