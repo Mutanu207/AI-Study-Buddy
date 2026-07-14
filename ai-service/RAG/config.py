@@ -1,0 +1,34 @@
+from pathlib import Path
+
+# PROJECT PATHS
+BASE_DIR = Path(__file__).resolve().parent
+
+VECTOR_DB_DIR = BASE_DIR / "vector_db"
+
+VECTOR_DB_DIR.mkdir(parents=True, exist_ok=True)
+
+# TEXT SPLITTING
+
+CHUNK_SIZE = 1000
+
+CHUNK_OVERLAP = 200
+
+
+# EMBEDDING MODEL
+
+EMBEDDING_MODEL = "BAAI/bge-base-en-v1.5"
+
+
+# RETRIEVAL SETTINGS
+TOP_K = 6
+
+SEARCH_TYPE = "similarity"
+
+
+# FUTURE SETTINGS
+
+#ENABLE_PARENT_DOCUMENT_RETRIEVAL = False
+
+#ENABLE_HYBRID_SEARCH = False
+
+#ENABLE_METADATA_FILTERING = False

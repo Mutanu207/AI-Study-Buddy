@@ -1,5 +1,6 @@
 import logging
 from typing import List #tell future devs the return of a function
+from config import EMBEDDING_MODEL
 
 from langchain_core.documents import Document #receive Documents from splitter
 from sentence_transformers import SentenceTransformer #imports the embed models that run locally
@@ -15,7 +16,7 @@ class EmbeddingManager:
 
     def __init__( #runs once when we create the object
         self,
-        model_name: str = "BAAI/bge-small-en-v1.5"
+        model_name: str = EMBEDDING_MODEL
     ) -> None:
 
         logger.info(

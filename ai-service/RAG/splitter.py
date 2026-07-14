@@ -3,6 +3,7 @@ from typing import List #py let us describe the type of function return
 
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_core.documents import Document
+from config import CHUNK_SIZE, CHUNK_OVERLAP
 
 logger = logging.getLogger(__name__)
 
@@ -34,9 +35,9 @@ def split_text( #input params
 
     splitter = RecursiveCharacterTextSplitter( #create an objec splitter
 
-        chunk_size=1000, #max size 1000 char
+        chunk_size= CHUNK_SIZE, #max size 1000 char
 
-        chunk_overlap=200, #repeats the last 200 char of one chunk at the start of the next chunk
+        chunk_overlap=CHUNK_OVERLAP, #repeats the last 200 char of one chunk at the start of the next chunk
 
         length_function=len,
 
