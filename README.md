@@ -83,65 +83,65 @@ This project is being built to explore modern software engineering practices whi
 
 ---
 
-# 🧠 AI Pipelines
+## AI Architecture
 
-## Question Generation Pipeline
+The AI Study Buddy backend is divided into two independent AI pipelines.
+
+### Pipeline 1 — Question & Answer Generation
 
 ```text
 PDF Upload
       │
       ▼
-Loader
+PDF Loader
       │
       ▼
 Cleaner
       │
       ▼
-Recursive Text Splitter
+Text Splitter
       │
       ▼
-Embeddings
+Embedding Generator
       │
       ▼
 Vector Store
       │
       ▼
-Retriever
+LLM Question Generator
       │
       ▼
-Question Generator
+Questions + Reference Answers
       │
       ▼
-Validator
-      │
-      ▼
-Questions + AI Reference Answers
+PostgreSQL
 ```
+
+The first pipeline is responsible for generating study questions and reference answers directly from the uploaded PDF.
 
 ---
 
-## Answer Evaluation Pipeline
+### Pipeline 2 — Answer Evaluation
 
 ```text
 Student Answers
         │
         ▼
-Evaluation Pipeline
+Retrieve Relevant Context
         │
         ▼
 LLM Evaluation
         │
         ▼
-Validator
-        │
-        ▼
-Feedback Objects
+is_correct
+Feedback Explanation
+Page Reference
         │
         ▼
 Feedback Database
 ```
 
-The evaluation pipeline compares student answers against AI-generated reference answers to provide meaningful feedback instead of simply marking responses as correct or incorrect.
+The second pipeline evaluates the student's answers against the stored reference answers while retrieving the relevant document context to produce grounded explanations and page references.
 
 ---
 
