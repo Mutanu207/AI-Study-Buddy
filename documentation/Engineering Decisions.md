@@ -161,3 +161,169 @@ Postpone multimodal image processing until after the MVP.
 - Vision models will be integrated in a future release.
 
 ---
+---
+
+## Semantic Chunking
+
+### Decision
+
+Use `RecursiveCharacterTextSplitter` with overlapping chunks.
+
+### Rationale
+
+- Preserves semantic context across chunk boundaries.
+- Improves retrieval quality.
+- Produces coherent chunks for downstream generation.
+
+---
+
+## LangChain Document Standardization
+
+### Decision
+
+Represent every chunk using LangChain `Document` objects.
+
+### Rationale
+
+- Standardizes data across the pipeline.
+- Keeps metadata attached to text.
+- Simplifies future integrations.
+
+---
+
+## SentenceTransformer Embeddings
+
+### Decision
+
+Use the local SentenceTransformer model (`all-MiniLM-L6-v2`) for embedding generation.
+
+### Rationale
+
+- Free to run locally.
+- No API dependency.
+- Fast inference.
+- Strong semantic retrieval performance.
+
+---
+
+## Embedding Generation Separation
+
+### Decision
+
+Separate embedding generation from vector storage.
+
+### Rationale
+
+- Each module has a single responsibility.
+- Easier testing.
+- Supports future vector database migrations.
+
+---
+
+## FAISS During MVP
+
+### Decision
+
+Use FAISS as the initial vector database.
+
+### Rationale
+
+- Lightweight.
+- Fast local development.
+- Easy debugging.
+- Production migration planned later.
+
+---
+
+## Production Vector Database
+
+### Decision
+
+Migrate from FAISS to PostgreSQL with pgvector before production deployment.
+
+### Rationale
+
+- Persistent storage.
+- Better scalability.
+- Simplifies deployment.
+- Centralizes application data.
+
+---
+
+## Session-Centered Data Model
+
+### Decision
+
+Use Sessions as the parent entity for Questions, Answers and Feedback.
+
+### Rationale
+
+- Represents one uploaded PDF and study attempt.
+- Eliminates redundant User IDs.
+- Simplifies analytics.
+- Supports dashboard history.
+
+---
+
+## Two-Pipeline RAG Architecture
+
+### Decision
+
+Separate the application into two independent RAG pipelines.
+
+### Pipeline 1
+
+- PDF Processing
+- Question Generation
+- Reference Answer Generation
+
+### Pipeline 2
+
+- User Answer Evaluation
+- Context Retrieval
+- Feedback Generation
+
+### Rationale
+
+- Improves modularity.
+- Avoids regenerating questions.
+- Enables repeated evaluations.
+- Keeps retrieval focused on explanations.
+
+---
+
+## Retrieval During Evaluation
+
+### Decision
+
+Retrieve supporting document context only during answer evaluation.
+
+### Rationale
+
+- Question generation already has full document context.
+- Retrieval is primarily needed to generate grounded explanations and page references.
+- Reduces unnecessary vector searches.
+
+---
+
+## Infrastructure Evolution Strategy
+
+### Decision
+
+Prioritize application functionality before infrastructure optimization.
+
+### Development
+
+- Local uploads
+- FAISS
+
+### Production
+
+- Amazon S3
+- PostgreSQL + pgvector
+
+### Rationale
+
+- Accelerates MVP development.
+- Reduces infrastructure complexity.
+- Production architecture remains scalable.
