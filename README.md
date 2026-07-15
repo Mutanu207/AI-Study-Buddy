@@ -5,6 +5,13 @@
 🚧 **Status:** Active Development
 
 ---
+## 📖 Overview
+
+AI Study Buddy is an AI-powered learning platform that transforms uploaded PDF documents into interactive study sessions.
+
+The application automatically generates questions and reference answers from the uploaded material, evaluates student responses, and provides personalized feedback supported by evidence retrieved directly from the original document.
+
+Every explanation is grounded in the uploaded PDF, allowing students to understand not only whether an answer is correct, but also **why**, with references to the exact section or page of the source material.
 
 ## 🎯 Project Goal
 
