@@ -1,4 +1,9 @@
 from pathlib import Path
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
 
 # PROJECT PATHS
 BASE_DIR = Path(__file__).resolve().parent
@@ -23,6 +28,28 @@ EMBEDDING_MODEL = "BAAI/bge-base-en-v1.5"
 TOP_K = 6
 
 SEARCH_TYPE = "similarity"
+
+#LLM CONFIG
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+
+LLM_MODEL = os.getenv(
+    "LLM_MODEL",
+    "llama-3.3-70b-versatile"
+)
+
+LLM_TEMPERATURE = float(
+    os.getenv(
+        "LLM_TEMPERATURE",
+        0.3
+    )
+)
+
+LLM_MAX_TOKENS = int(
+    os.getenv(
+        "LLM_MAX_TOKENS",
+        2000
+    )
+)
 
 
 # FUTURE SETTINGS

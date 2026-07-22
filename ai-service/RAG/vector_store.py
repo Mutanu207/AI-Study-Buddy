@@ -24,8 +24,8 @@ class VectorStoreManager:
 
     def store_embeddings( #public function that receives the chunks and vectors
         self,
-        documents: List[Document], #inputs
-        vectors: List[List[float]]
+        documents: List[Document], #input from splitter
+        vectors: List[List[float]] #input from embedding
     ) -> None:
         """
         Store precomputed embeddings in a FAISS index.

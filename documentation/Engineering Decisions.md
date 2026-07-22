@@ -327,3 +327,58 @@ Prioritize application functionality before infrastructure optimization.
 - Accelerates MVP development.
 - Reduces infrastructure complexity.
 - Production architecture remains scalable.
+
+## External Prompt Management
+
+### Decision
+
+Store all LLM prompts inside a dedicated `prompts/` package instead of embedding prompts directly inside Python classes.
+
+### Rationale
+
+- Separates prompt engineering from application logic.
+- Makes prompts easier to update and version control.
+- Improves readability of generator classes.
+- Simplifies future prompt experimentation and evaluation.
+
+---
+
+## Python Controls Retrieval Metadata
+
+### Decision
+
+Assign `chunk_index` in Python after question generation instead of asking the LLM to return it.
+
+### Rationale
+
+- Eliminates the possibility of the LLM hallucinating incorrect chunk references.
+- Keeps retrieval metadata deterministic.
+- Ensures every generated question references the exact document chunk that produced it.
+
+---
+
+## Dedicated Validation Layer
+
+### Decision
+
+Validate all LLM-generated questions before storing them in the database using a dedicated validator component.
+
+### Rationale
+
+- Prevents malformed AI responses from entering the database.
+- Separates validation from generation following the Single Responsibility Principle.
+- Allows future validation rules to be added without modifying generator logic.
+
+---
+
+## Retrieval Using Session ID and Chunk Index
+
+### Decision
+
+Retrieve supporting context during answer evaluation using both `session_id` and `chunk_index`.
+
+### Rationale
+
+- Chunk indexes are only unique within a single uploaded document.
+- Session IDs uniquely identify each uploaded PDF.
+- Combining both guarantees retrieval from the correct document and prevents collisions between different study sessions.

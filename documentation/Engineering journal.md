@@ -300,3 +300,26 @@ Engineering Decisions
 - EmbeddingManager is responsible only for generating vectors.
 - VectorStoreManager is responsible only for storing vectors.
 - Retrieval will consume stored vectors without regenerating embeddings.
+
+## Date
+
+2026-07-21
+
+## Today's Work
+
+- Refactored the LLM prompt architecture by separating system prompts and user prompts into a dedicated `prompts/` package.
+- Created a reusable `QUESTION_SYSTEM_PROMPT` for question generation.
+- Updated `generator.py` to load prompts from external prompt files instead of embedding prompts directly in code.
+- Implemented the `generate_questions()` method in `generator.py`.
+- Designed and implemented `QuestionValidator` to validate LLM-generated questions before storing them.
+- Finalized the question generation pipeline architecture where Python attaches the `chunk_index` instead of relying on the LLM.
+- Reviewed the complete RAG data flow from document splitting through question generation and clarified how chunk metadata will be used during answer evaluation.
+- Designed the retrieval strategy for the Answer Evaluation Pipeline using both `session_id` and `chunk_index` to uniquely retrieve the correct source chunk.
+
+## Lessons Learned
+
+- JSON arrays returned by an LLM become Python lists after using `json.loads()`.
+- Validation should be separated from generation to follow the Single Responsibility Principle.
+- Prompt engineering becomes easier to maintain when prompts are stored outside application logic.
+- The LLM should only generate educational content while Python is responsible for attaching application-specific metadata such as `chunk_index`.
+- `session_id` and `chunk_index` together uniquely identify the correct source chunk for retrieval during answer evaluation.

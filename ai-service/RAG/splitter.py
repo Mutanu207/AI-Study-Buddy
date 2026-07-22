@@ -51,7 +51,7 @@ def split_text( #input params
     )
 
     text_chunks = splitter.split_text(clean_text) #splitting the clean_text input and storing them in text_chunk
-
+    print(text_chunks)
     documents = [] #create a list
 
     for index, chunk in enumerate(text_chunks): #loop through every text chunk,giving it the 
