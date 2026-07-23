@@ -72,7 +72,8 @@ class QuestionValidator: #use class to group all the functions together
 
         for question in questions: #loop through the list and we go through every object inside
 
-            self._validate_question( #call this function to validate the objects
+            self._validate_question( 
+                question   #call this function to validate the objects
             )
 
         logger.info(

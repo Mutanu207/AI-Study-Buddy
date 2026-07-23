@@ -76,5 +76,5 @@ class EmbeddingManager:
         )
 
         return embeddings
-
+    
    

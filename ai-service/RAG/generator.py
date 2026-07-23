@@ -146,7 +146,7 @@ class Generator:
     def generate_questions(
         self,
         document: Document, #Input is one Document object
-        number_of_questions: int = 2,
+        number_of_questions: int = 1,
         )  -> List[Dict[str, Any]]:
         """
         Generate study questions from a single document chunk.

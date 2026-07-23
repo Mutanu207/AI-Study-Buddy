@@ -11,8 +11,6 @@ logger = logging.getLogger(__name__)
 def split_text( #input params
     clean_text: str,
     session_id: int,
-    document_id: int,
-    source: str,
 ) -> List[Document]:
     """
     Split cleaned text into overlapping semantic chunks and attach metadata.
@@ -24,7 +22,8 @@ def split_text( #input params
         source: Original PDF filename or file path.
 
     Returns:
-        List of LangChain Document objects.
+        List of LangChain Document objects.    Returns:
+
     """
 
     if not clean_text or not clean_text.strip(): #check if we get input data
@@ -68,10 +67,6 @@ def split_text( #input params
                     "chunk_index": index,
 
                     "session_id": session_id,
-
-                    "document_id": document_id,
-
-                    "source": source
 
                 }
 
