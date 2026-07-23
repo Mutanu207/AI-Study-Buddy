@@ -1,5 +1,7 @@
 import { createNewSessions,fetchFilePath } from "./sessions.model.js"
 import { generateQuestions } from "../ai/ai.service.js"
+import { saveQuestions } from "../questions/question.service.js"
+import path from "path";
 export const newSessions = async (document_id,userid) => {
     try{
         //call model db thats saves documentid and userid and returns session id//
@@ -17,14 +19,19 @@ export const newSessions = async (document_id,userid) => {
         console.log(pdf_path)
         const sessionId= session.id 
         const file_path= pdf_path.file_path
+        const absolutePath = path.resolve(file_path);
+      
         //send req to the ai folder which is the bridge between the express and rag-python//
-        const questions= await generateQuestions(sessionId,document_id,file_path)
+        const questions= await generateQuestions(sessionId,absolutePath)
         console.log(questions)
-        return {id:session.id}
+        //after getting questions back send the to the questions folder,for them to be saved
+        await saveQuestions(sessionId,questions)
+        console.log(sessionId)
+        return {id:sessionId}
     }
     catch(error){
-        console.error(
-            "session service error", error)
+        console.error(error)
+        throw new Error(error.message)
     }
 }
 

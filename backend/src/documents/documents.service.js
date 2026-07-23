@@ -5,6 +5,7 @@ export const uploadDocument = async (userid,filename,filepath)=> {
     if (!filename) throw new Error("No file name")
     if(!filepath) throw new Error("No file path")
     const userDetail= await createDocument(userid,filename,filepath)
+    if(!userDetail) throw new Error("No document found")
     return {id:userDetail.id} }
     catch(error){
         throw new Error(error)
