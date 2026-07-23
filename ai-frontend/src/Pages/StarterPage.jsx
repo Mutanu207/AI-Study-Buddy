@@ -5,15 +5,23 @@ import { useDropzone } from 'react-dropzone';
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import Button from "@mui/material/Button";
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
+import { useNavigate } from "react-router-dom";
 import PrimaryButton from "../Components/PrimaryButton";
 import { useUsername } from "../hooks/useUsername";
 import { uploadPdf, createSessions } from "../serivce/api";
 
 
 function StarterPage() {
+    const navigate= useNavigate();
     const [files, setFiles] = useState(null);
     const [docId, setDocId]= useState(null)
-    const [sessionsId, setUserSessions]= useState(null);
+     const [notification, setNotification] =useState({
+            open: false,
+            message: "",
+            severity: "success"
+        })
     const { username, loading,userEmail, setUsername} = useUsername();
     const onDrop = (acceptedFiles) => {
         setFiles(acceptedFiles[0]);
@@ -32,9 +40,19 @@ function StarterPage() {
         try{
         const response= await uploadPdf(files)     
         setDocId(response.id)   
-        if(docId) setFiles(null)}
+        if(docId) setFiles(null)
+        setNotification({
+            open: true,
+            message: response.message,
+            severity: "success"
+        });}
        catch(error){
-        console.error(error)
+        console.error(error) //handle error if the upload fails, use notification//
+        setNotification({
+            open: true,
+            message: error.response?.data?.message || "Failed to upload PDF",
+            severity: "error"
+        });
     }}
 
     const handleSessions= async () => {
@@ -42,12 +60,23 @@ function StarterPage() {
             return alert("Make sure you have uploaded the pdf")
         }
         try{
-            const response= await createSessions(docId)
-            setUserSessions(response.id)
-            console.log(sessionsId)// send over the message//
+            const response= await createSessions(docId) //create a session and return session id
+            setNotification({
+            open: true,
+            message: response.message,
+            severity: "success"
+        });
+           setTimeout(() => {
+            navigate(`/questions/${response.sessionId}`);
+        }, 1500); 
         }
         catch(error){
             console.error(error)
+            setNotification({
+            open: true,
+            message: error.response?.data?.message || "Failed to upload PDF",
+            severity: "error"
+        });
         }
     }
 
@@ -106,6 +135,7 @@ function StarterPage() {
         { docId && ( //if the doc id is there it means user has uploaded pdf and it has been stored in the db//
             <>
                 <PrimaryButton size="large" background="#1A1A40" color="#fff" 
+                        gutterBottom={2}
                         sx={{ mt: 10 }} 
                         disabled={!docId}
                         onClick={handleSessions}
@@ -114,6 +144,21 @@ function StarterPage() {
         </PrimaryButton>
         </>
         )}
+        <Snackbar
+                   open={notification.open}
+                   autoHideDuration={3000}
+                   onClose={() => setNotification(prev => ({ ...prev, open: false }))}
+                   anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+               >
+                   <Alert
+                       severity={
+                           notification.severity
+                       }
+                       variant="filled">
+                   
+                       {notification.message} 
+                   </Alert>
+               </Snackbar>
     
         </Box>
         </>
