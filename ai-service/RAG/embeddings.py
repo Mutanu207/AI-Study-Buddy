@@ -58,7 +58,6 @@ class EmbeddingManager:
             doc.page_content
             for doc in documents
         ] #loops through document using for loop and grabs the page_contnet for every Document model, and places it the list
-        print("start embedding after")
         embeddings = self.model.encode(
 
             texts,

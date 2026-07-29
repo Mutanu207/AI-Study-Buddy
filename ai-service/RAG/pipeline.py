@@ -138,7 +138,6 @@ class QuestionGenerationPipeline:
             )
 
     # Split cleaned text into semantic chunks
-            print("start splitting")
 
             documents = split_text(
 
@@ -155,10 +154,8 @@ class QuestionGenerationPipeline:
                 len(documents)
 
             )
-            print(len(documents))
 
     # Convert text chunks to vectors
-            print("start embedding")
             vectors = self.embedding_manager.embed_documents(
                 documents
             )
@@ -167,8 +164,6 @@ class QuestionGenerationPipeline:
                 "Generated embeddings for %d chunks.",
                 len(vectors)
             )
-            print(len(vectors))
-            print("finish embedding")
 
     # Store embeddings inside the vector database
    
