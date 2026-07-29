@@ -6,6 +6,5 @@ import pool from "../config/dbConfig.js";
 
    export const fetchFilePath= async (docid) => {
       const result= await pool.query("SELECT file_path FROM documents WHERE id=$1", [docid])
-      console.log(result.rows[0])
       return result.rows[0]
    }

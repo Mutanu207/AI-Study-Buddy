@@ -6,7 +6,6 @@ export const uploadDocument = async (userid,filename,filepath)=> {
     if(!filepath) throw new Error("No file path")
     const userDetail= await createDocument(userid,filename,filepath)
     if(!userDetail) throw new Error("No document found")
-    console.log("userDetail in documents.service.js",userDetail)
     return  userDetail.id }//return the document id to the controller to send to frontend}
     catch(error){
         throw new Error(error)

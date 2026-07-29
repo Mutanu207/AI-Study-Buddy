@@ -23,10 +23,8 @@ export const newSessions = async (document_id,userid) => {
       
         //send req to the ai folder which is the bridge between the express and rag-python//
         const questions= await generateQuestions(sessionId,absolutePath)
-        console.log(questions)
         //after getting questions back send the to the questions folder,for them to be saved
         await saveQuestions(sessionId,questions)
-        console.log(sessionId)
         return {id:sessionId}
     }
     catch(error){
