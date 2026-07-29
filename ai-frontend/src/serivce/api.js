@@ -23,7 +23,7 @@ api.interceptors.response.use((response) => response
         originalRequest._retry = true;
         try {
             const response = await api.post("/auth/refresh-token");
-            const newToken = response.data.token;
+            const newToken = response.data.accessToken;
             localStorage.setItem("token", newToken);
             originalRequest.headers["Authorization"] = `Bearer ${newToken}`;//updates failed req with new req header that has the new token//
             return api(originalRequest); //run the req that had failed with the new token//
@@ -31,7 +31,7 @@ api.interceptors.response.use((response) => response
         catch (refreshError) {
             localStorage.removeItem("token");
             window.location.href = "/login";
-            window.location.reject(refreshError);
+            return Promise.reject(refreshError);
         }
 
     }
@@ -46,3 +46,38 @@ export const loginUser = async (user) => {
    
         const response = await api.post("/auth/login", user);
         return response.data;}
+
+export const fetchUser = async () => { 
+        const response = await api.get("/user/me");
+        return response.data; }
+
+export const uploadPdf = async (file) => {
+    const formData = new FormData();
+
+    formData.append("pdf", file);
+
+    const response = await api.post(
+        "/documents/upload",
+        formData
+    );
+    console.log("Response in uploadPdf, document id:", response.data);
+    return response.data; // we need to return docId//
+   
+};
+export const updateUsername = async (username) =>{
+    const result = await api.post("/user/update", {
+        editUsername: username
+})
+    return result.data
+}
+export const logoutCurrentUser = async () => {
+    const result = await api.get("/auth/logout")
+    return result.data}
+
+export const createSessions = async(docid) => {
+    const result = await api.post("/sessions/create", {
+        docId:docid //when we send a request we pick it up as req.body.docId in sessions//
+    } )
+    console.log(result.data)
+    return result.data
+}
