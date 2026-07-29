@@ -2,18 +2,48 @@ import logging
 
 from typing import List, Dict, Any
 
-from loader import load_pdf
-from cleaner import clean_text
-from splitter import split_text
+from .loader import load_pdf
+from .cleaner import clean_text
+from .splitter import split_text
 
-from embeddings import EmbeddingManager
-from vector_store import VectorStoreManager
+from .embeddings import EmbeddingManager
+from .vector_store import VectorStoreManager
 
-from generator import Generator
-from validator import QuestionValidator
+from .generator import Generator
+from .validator import QuestionValidator
 import random
 
 logger = logging.getLogger(__name__)
+SKIP_KEYWORDS = [
+   "table of contents",
+
+    "contents",
+
+    "references",
+
+    "bibliography",
+
+    "course evaluation",
+
+    "mode of delivery",
+
+    "lecturer contact",
+
+    "assessment",
+
+    "email",
+
+    "e-mail",
+
+    "contact",
+
+    "exercise tag",
+
+    "green exercise tag",
+
+    "suggested corrections",
+
+    "elearning@",]
 
 class QuestionGenerationPipeline:
     """
@@ -63,6 +93,7 @@ class QuestionGenerationPipeline:
         logger.info(
             "Question Generation Pipeline initialized successfully."
         )
+   
     def process_document(
         self,
         file_path: str,
@@ -78,122 +109,136 @@ class QuestionGenerationPipeline:
             session_id:
                 Current study session identifier.
 
-        Returns:
-            A validated list of generated questions.
-        """
+            Returns:
+                A validated list of generated questions.
+            """
 
         logger.info(
-            "Starting Question Generation Pipeline."
-        )
+                "Starting Question Generation Pipeline."
+            )
 
     # Extract raw text from the uploaded PDF
-        raw_text = load_pdf(
-            file_path=file_path
-        )
+        try:
+            raw_text = load_pdf(
+                file_path=file_path
+            )
 
-        logger.info(
-            "Raw text extracted successfully."
-        )
+            logger.info(
+                "Raw text extracted successfully."
+            )
 
     # Clean extracted text
-        cleaned_text = clean_text(
-            raw_text
-        )
+            cleaned_text = clean_text(
+                raw_text
+            )
 
-        logger.info(
-            "Text cleaned successfully."
-        )
+            logger.info(
+                "Text cleaned successfully."
+            )
 
     # Split cleaned text into semantic chunks
+            print("start splitting")
 
-        documents = split_text(
+            documents = split_text(
 
-            clean_text=cleaned_text,
+                clean_text=cleaned_text,
 
-            session_id=session_id,
-   
+                session_id=session_id,
 
-        )
+            )
 
-        logger.info(
+            logger.info(
 
-        "Generated %d document chunks.",
+            "Generated %d document chunks.",
 
-            len(documents)
+                len(documents)
 
-        )
+            )
+            print(len(documents))
 
     # Convert text chunks to vectors
+            print("start embedding")
+            vectors = self.embedding_manager.embed_documents(
+                documents
+            )
 
-        vectors = self.embedding_manager.embed_documents(
-            documents
-        )
-
-        logger.info(
-            "Generated embeddings for %d chunks.",
-            len(vectors)
-        )
+            logger.info(
+                "Generated embeddings for %d chunks.",
+                len(vectors)
+            )
+            print(len(vectors))
+            print("finish embedding")
 
     # Store embeddings inside the vector database
    
-        self.vector_store.store_embeddings(
+            self.vector_store.store_embeddings(
 
-            documents=documents,
+                documents=documents,
 
-            vectors=vectors
+                vectors=vectors
 
-        )
+                )
 
-        logger.info(
-        "Embeddings stored successfully."
-        )
+            logger.info(
+            "Embeddings stored successfully."
+            )
+        #before generating questions, filter out chunks that contain administrative content
+            filtered_documents = []
 
+            for document in documents:
+
+                text = document.page_content.lower()
+
+                if any(keyword in text for keyword in SKIP_KEYWORDS):
+
+                    logger.info(
+                        "Skipping chunk because it contains administrative content."
+                    )
+
+                    continue
+
+                filtered_documents.append(document)
     # Generate questions from every document chunk
-        questions = []
+            questions = []
+            random.shuffle(filtered_documents) #shuffle the filtered documents list to ensure randomness in question generation
 
-        selected_documents = random.sample(
+            for document in filtered_documents:
 
-        documents,
+                generated_questions = (
+                self.generator.generate_questions(
+                    document=document
+                )
+                )
+                if(generated_questions):
+                    questions.extend(generated_questions)                    
+                if len(questions) >= 15:
+                    break
 
-        k=min(15, len(documents))
+            logger.info(
 
-        )
+            "Generated %d questions.",
 
-        for document in selected_documents:
+            len(questions)
 
-            generated_questions = (
-            self.generator.generate_questions(
-                document=document
             )
-            )
-
-            questions.extend(
-                generated_questions
-            )
-
-        logger.info(
-
-        "Generated %d questions.",
-
-        len(questions)
-
-        )
     # Validate generated questions
 
-        validated_questions = (
-        self.validator.validate_questions(
-            questions
-        )
-        )
+            validated_questions = (
+            self.validator.validate_questions(
+                questions
+            )
+            )
 
-        logger.info(
-        "Validated %d questions successfully.",
-        len(validated_questions)
-        )
+            logger.info(
+            "Validated %d questions successfully.",
+            len(validated_questions)
+            )
 
-        logger.info(
-        "Question Generation Pipeline completed successfully."
-        )
+            logger.info(
+            "Question Generation Pipeline completed successfully."
+            )
 
-        return validated_questions
-        
+            return validated_questions
+        except Exception as error:
+            logger.exception("Pipeline failed.")
+            raise

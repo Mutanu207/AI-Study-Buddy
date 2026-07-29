@@ -6,16 +6,16 @@ from groq import Groq #llm we are using
 
 from langchain_core.documents import Document
 
-from config import (
+from .config import (
     GROQ_API_KEY,
     LLM_MODEL,
     LLM_TEMPERATURE,
     LLM_MAX_TOKENS,
 )
-from prompts.system_prompt import (
+from .prompts.system_prompt import (
     QUESTION_SYSTEM_PROMPT
 )
-from prompts.question_prompt import (build_question_prompt)
+from .prompts.question_prompt import (build_question_prompt)
 logger = logging.getLogger(__name__)
 
 
@@ -146,7 +146,7 @@ class Generator:
     def generate_questions(
         self,
         document: Document, #Input is one Document object
-        number_of_questions: int = 1,
+        number_of_questions: int = 2,
         )  -> List[Dict[str, Any]]:
         """
         Generate study questions from a single document chunk.

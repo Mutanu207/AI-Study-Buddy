@@ -60,7 +60,8 @@ export const uploadPdf = async (file) => {
         "/documents/upload",
         formData
     );
-    return response.data; // we need t0 return d0cId//
+    console.log("Response in uploadPdf, document id:", response.data);
+    return response.data; // we need to return docId//
    
 };
 export const updateUsername = async (username) =>{
@@ -75,7 +76,7 @@ export const logoutCurrentUser = async () => {
 
 export const createSessions = async(docid) => {
     const result = await api.post("/sessions/create", {
-        docId:docid
+        docId:docid //when we send a request we pick it up as req.body.docId in sessions//
     } )
     console.log(result.data)
     return result.data

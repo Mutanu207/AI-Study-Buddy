@@ -11,12 +11,14 @@ import { useNavigate } from "react-router-dom";
 import PrimaryButton from "../Components/PrimaryButton";
 import { useUsername } from "../hooks/useUsername";
 import { uploadPdf, createSessions } from "../serivce/api";
+import CircularProgress from '@mui/material/CircularProgress';
 
 
 function StarterPage() {
     const navigate= useNavigate();
     const [files, setFiles] = useState(null);
-    const [docId, setDocId]= useState(null)
+    const [docId, setDocId]= useState(null);
+    const [loadingSession, setLoadingSession] = useState(false);
      const [notification, setNotification] =useState({
             open: false,
             message: "",
@@ -39,8 +41,7 @@ function StarterPage() {
         }//add notification//
         try{
         const response= await uploadPdf(files)     
-        setDocId(response.id)   
-        if(docId) setFiles(null)
+        setDocId(response.docId)   
         setNotification({
             open: true,
             message: response.message,
@@ -59,6 +60,10 @@ function StarterPage() {
         if (!docId){
             return alert("Make sure you have uploaded the pdf")
         }
+        if(loadingSession){
+            return;
+        }
+        setLoadingSession(true)
         try{
             const response= await createSessions(docId) //create a session and return session id
             setNotification({
@@ -66,6 +71,7 @@ function StarterPage() {
             message: response.message,
             severity: "success"
         });
+        setFiles(null) //clear the file state after upload//
            setTimeout(() => {
             navigate(`/questions/${response.sessionId}`);
         }, 1500); 
@@ -74,9 +80,10 @@ function StarterPage() {
             console.error(error)
             setNotification({
             open: true,
-            message: error.response?.data?.message || "Failed to upload PDF",
+            message: error.response?.data?.message || "Failed to start session",
             severity: "error"
         });
+        setLoadingSession(false)
         }
     }
 
@@ -134,16 +141,31 @@ function StarterPage() {
         )}
         { docId && ( //if the doc id is there it means user has uploaded pdf and it has been stored in the db//
             <>
+            <Box
+            sx={{mt:8,
+                display: 'flex'
+            }}>
                 <PrimaryButton size="large" background="#1A1A40" color="#fff" 
-                        gutterBottom={2}
                         sx={{ mt: 10 }} 
-                        disabled={!docId}
+                        disabled={!docId || loadingSession}
                         onClick={handleSessions}
                         >
-            Start Session
-        </PrimaryButton>
-        </>
-        )}
+                {loadingSession ? <>
+                        <Box
+                            sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 1
+                            }}>
+                        <CircularProgress size={20} color="inherit"/>
+
+                        <Typography variant="button" color="inherit">
+                        Generating Questions...</Typography>
+                        </Box></>: "Start Session"} 
+                </PrimaryButton>
+                </Box>
+                </>
+            )}
         <Snackbar
                    open={notification.open}
                    autoHideDuration={3000}

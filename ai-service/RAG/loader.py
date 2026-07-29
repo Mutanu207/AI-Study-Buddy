@@ -1,7 +1,7 @@
 import logging #LOGGING LIBRARY
 from pathlib import Path #creates object that allows us to use methods to manipulate file paths
 
-import fitz
+import pymupdf
 
 
 logger = logging.getLogger(__name__) #creates a logger that i will use in the code
@@ -36,7 +36,7 @@ def load_pdf(file_path: str) -> str: #file_path is a string and the output is a 
     extracted_text = [] #create list to store the text,much easier since of its methods
 
     try:
-        with fitz.open(pdf_path) as document: #open the file and store it in the variable document and close it after the block is done automatically
+        with pymupdf.open(pdf_path) as document: #open the file and store it in the variable document and close it after the block is done automatically
 
             logger.info("PDF loaded successfully.")
 

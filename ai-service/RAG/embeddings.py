@@ -1,6 +1,6 @@
 import logging
 from typing import List #tell future devs the return of a function
-from config import EMBEDDING_MODEL
+from .config import EMBEDDING_MODEL
 
 from langchain_core.documents import Document #receive Documents from splitter
 from sentence_transformers import SentenceTransformer #imports the embed models that run locally
@@ -35,7 +35,7 @@ class EmbeddingManager:
     def embed_documents(
         self,
         documents: List[Document]
-    ) -> List[List[float]]:
+        ) -> List[List[float]]:
         """
         Generate embeddings for document chunks.
         """
@@ -58,14 +58,16 @@ class EmbeddingManager:
             doc.page_content
             for doc in documents
         ] #loops through document using for loop and grabs the page_contnet for every Document model, and places it the list
-
+        print("start embedding after")
         embeddings = self.model.encode(
 
             texts,
 
+            batch_size=16,
+
             convert_to_numpy=False,
 
-            show_progress_bar=False,
+            show_progress_bar=True,
 
             normalize_embeddings=True
 

@@ -3,7 +3,7 @@ from typing import List #py let us describe the type of function return
 
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_core.documents import Document
-from config import CHUNK_SIZE, CHUNK_OVERLAP
+from .config import CHUNK_SIZE, CHUNK_OVERLAP
 
 logger = logging.getLogger(__name__)
 
@@ -50,7 +50,6 @@ def split_text( #input params
     )
 
     text_chunks = splitter.split_text(clean_text) #splitting the clean_text input and storing them in text_chunk
-    print(text_chunks)
     documents = [] #create a list
 
     for index, chunk in enumerate(text_chunks): #loop through every text chunk,giving it the 
@@ -73,7 +72,6 @@ def split_text( #input params
             )
 
         )
-
     logger.info("Generated %d document chunks.", len(documents))
 
     return documents #return the list document with Documents object inside that contains chunks and metadata
