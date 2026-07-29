@@ -4,7 +4,7 @@ from langchain_core.documents import Document #for the document objecyt
 
 def build_question_prompt(
     chunk: str,
-    number_of_questions: int = 2,
+    number_of_questions : int,
 ) -> str:
     """
     Build the prompt for generating study questions

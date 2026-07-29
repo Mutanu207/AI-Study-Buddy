@@ -43,7 +43,8 @@ SKIP_KEYWORDS = [
 
     "suggested corrections",
 
-    "elearning@",]
+    "elearning@"]
+TARGET_QUESTIONS=15
 
 class QuestionGenerationPipeline:
     """
@@ -198,31 +199,48 @@ class QuestionGenerationPipeline:
                     continue
 
                 filtered_documents.append(document)
+
+            #getting to know the number of chunks to know the number of questions to generate
+            chunk_count = len(filtered_documents)
+
+            if chunk_count <= 7:
+                questions_per_chunk = 3
+
+            elif chunk_count <= 15:
+                questions_per_chunk = 2
+
+            else:
+                questions_per_chunk = 1
     # Generate questions from every document chunk
             questions = []
-            random.shuffle(filtered_documents) #shuffle the filtered documents list to ensure randomness in question generation
-
-            for document in filtered_documents:
-
+            selected_documents = filtered_documents.copy() #create a copy of fileterd_documents na dput it in the selected_documents list
+            random.shuffle(selected_documents)
+            while len(questions)< TARGET_QUESTIONS and selected_documents: #loop this code while the questions are not yet 15 and selected_documets has chunks left
+                document=selected_documents.pop(0)
                 generated_questions = (
                 self.generator.generate_questions(
-                    document=document
+                    document=document,
+                    number_of_questions= questions_per_chunk
+
                 )
                 )
                 if(generated_questions):
-                    questions.extend(generated_questions)                    
-                if len(questions) >= 15:
-                    break
+                    questions.extend(generated_questions) 
+                                     
+                if len(questions) >=TARGET_QUESTIONS: #if the number of objects in the ist is 15 or greater than 15 then break the loop
+                    break     
+                    
 
             logger.info(
-
+  
             "Generated %d questions.",
 
             len(questions)
 
             )
-    # Validate generated questions
-
+    # Validate generated questions, the first 15 generated questions
+            if len(questions)> TARGET_QUESTIONS:
+                questions = questions[:TARGET_QUESTIONS]
             validated_questions = (
             self.validator.validate_questions(
                 questions

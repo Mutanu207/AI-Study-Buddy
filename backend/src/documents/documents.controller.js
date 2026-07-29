@@ -13,7 +13,7 @@ export const uploadPdf= async(req,res) => {
 
         return res.status(400).json({
 
-        message: "PDF must be smaller than 10 MB."
+        message: "PDF must be smaller than 3 MB."
 
         });}
         else{
