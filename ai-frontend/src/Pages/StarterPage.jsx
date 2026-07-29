@@ -5,34 +5,87 @@ import { useDropzone } from 'react-dropzone';
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
 import Button from "@mui/material/Button";
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
+import { useNavigate } from "react-router-dom";
 import PrimaryButton from "../Components/PrimaryButton";
 import { useUsername } from "../hooks/useUsername";
-import { uploadPdf } from "../serivce/api";
+import { uploadPdf, createSessions } from "../serivce/api";
+import CircularProgress from '@mui/material/CircularProgress';
+
 
 function StarterPage() {
+    const navigate= useNavigate();
     const [files, setFiles] = useState(null);
-    const [docId, setDocId]= useState(null)
+    const [docId, setDocId]= useState(null);
+    const [loadingSession, setLoadingSession] = useState(false);
+     const [notification, setNotification] =useState({
+            open: false,
+            message: "",
+            severity: "success"
+        })
     const { username, loading,userEmail, setUsername} = useUsername();
     const onDrop = (acceptedFiles) => {
         setFiles(acceptedFiles[0]);
-    }
+    } // this adds the firts pdf to the state setFiles when a file is dropped or added 
 
     const {getRootProps, getInputProps, isDragActive} = 
     useDropzone({onDrop,
-                    accept:{'application/pdf': ['.pdf']},
-                    multiple: false});
+                    accept:{'application/pdf': ['.pdf']}, //accept pdf only//
+                    multiple: false}); //not multiple pdfs//
     
+    //send the pdf to the backend by sending post req to nbackend api using function uploadpdf//
     const handlePdfSubmit= async ()=> {
         if(!files) {
             return alert("Input PDF")
-        }
+        }//add notification//
         try{
         const response= await uploadPdf(files)     
-        setDocId(response.id)   
-        if(docId) setFiles(null)}
+        setDocId(response.docId)   
+        setNotification({
+            open: true,
+            message: response.message,
+            severity: "success"
+        });}
        catch(error){
-        console.error(error)
+        console.error(error) //handle error if the upload fails, use notification//
+        setNotification({
+            open: true,
+            message: error.response?.data?.message || "Failed to upload PDF",
+            severity: "error"
+        });
     }}
+
+    const handleSessions= async () => {
+        if (!docId){
+            return alert("Make sure you have uploaded the pdf")
+        }
+        if(loadingSession){
+            return;
+        }
+        setLoadingSession(true)
+        try{
+            const response= await createSessions(docId) //create a session and return session id
+            setNotification({
+            open: true,
+            message: response.message,
+            severity: "success"
+        });
+        setFiles(null) //clear the file state after upload//
+           setTimeout(() => {
+            navigate(`/questions/${response.sessionId}`);
+        }, 1500); 
+        }
+        catch(error){
+            console.error(error)
+            setNotification({
+            open: true,
+            message: error.response?.data?.message || "Failed to start session",
+            severity: "error"
+        });
+        setLoadingSession(false)
+        }
+    }
 
     if (loading) return  <Typography variant="h6" align="center" sx={{ mt: 4 }}>Loading...</Typography>;
    
@@ -69,33 +122,65 @@ function StarterPage() {
             ) : (
                 <Typography variant="h6">Drag 'n' drop a PDF file here, or click to select a file</Typography>
             )} </Paper>
-            {!docId &&(
+            {!docId &&(// if doc id is not there it means the pdf has not been uploaded so show the delete and upload pdf buttons//
                 <>
         <Button variant="contained" 
                 color="error" 
-                disabled={!files}
+                disabled={!files} //buttons is disabled if the user has not uploaded pdf//
                 sx={{ mt: 4, mb: 2 }}  
                 onClick={() => setFiles(null)}>
             Remove File
         </Button>
         <PrimaryButton size="large" background="#1A1A40" color="#fff" 
                         sx={{ mt: 4 }} 
-                        disabled={!files}
+                        disabled={!files} //buttons is disabled if the user has not uploaded pdf//
                         onClick={handlePdfSubmit}>
             Upload PDF
         </PrimaryButton>
         </>
         )}
-        { docId && (
+        { docId && ( //if the doc id is there it means user has uploaded pdf and it has been stored in the db//
             <>
+            <Box
+            sx={{mt:8,
+                display: 'flex'
+            }}>
                 <PrimaryButton size="large" background="#1A1A40" color="#fff" 
                         sx={{ mt: 10 }} 
-                        disabled={!docId}
+                        disabled={!docId || loadingSession}
+                        onClick={handleSessions}
                         >
-            Start Session
-        </PrimaryButton>
-        </>
-        )}
+                {loadingSession ? <>
+                        <Box
+                            sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 1
+                            }}>
+                        <CircularProgress size={20} color="inherit"/>
+
+                        <Typography variant="button" color="inherit">
+                        Generating Questions...</Typography>
+                        </Box></>: "Start Session"} 
+                </PrimaryButton>
+                </Box>
+                </>
+            )}
+        <Snackbar
+                   open={notification.open}
+                   autoHideDuration={3000}
+                   onClose={() => setNotification(prev => ({ ...prev, open: false }))}
+                   anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+               >
+                   <Alert
+                       severity={
+                           notification.severity
+                       }
+                       variant="filled">
+                   
+                       {notification.message} 
+                   </Alert>
+               </Snackbar>
     
         </Box>
         </>
