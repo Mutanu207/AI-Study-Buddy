@@ -382,3 +382,51 @@ Retrieve supporting context during answer evaluation using both `session_id` and
 - Chunk indexes are only unique within a single uploaded document.
 - Session IDs uniquely identify each uploaded PDF.
 - Combining both guarantees retrieval from the correct document and prevents collisions between different study sessions.
+
+### Chunk Filtering Before Question Generation
+### Decision
+
+Filter document chunks that contain administrative or non-educational content before sending them to the LLM.
+
+### Rationale
+Reduces unnecessary LLM calls.
+Prevents generating questions from irrelevant sections such as references or course metadata.
+Improves overall question quality.
+Lowers inference cost.
+
+### Adaptive Question Generation
+### Decision
+
+Generate a variable number of questions per chunk depending on the number of educational chunks extracted from the uploaded document.
+
+### Rationale
+Small documents require more questions per chunk to achieve reasonable quiz coverage.
+Large documents require fewer questions per chunk to maximize topic diversity.
+Prevents over-representing a single chunk while still targeting a fixed quiz size.
+Randomized Chunk Selection
+Decision
+
+### Shuffle educational chunks before question generation.
+
+### Rationale
+Prevents the quiz from always covering only the beginning of a document.
+Improves coverage across different topics.
+Produces more varied quizzes between study sessions.
+Python Controls Quiz Size
+Decision
+
+### Allow Python, rather than the LLM, to determine when sufficient questions have been generated.
+
+### Rationale
+Keeps quiz size deterministic.
+Prevents unnecessary LLM calls once the target number of questions has been reached.
+Separates generation logic from orchestration logic.
+Educational-Only Prompt Strategy
+Decision
+
+### Explicitly instruct the LLM to ignore administrative content and return an empty JSON array when a chunk cannot produce meaningful educational questions.
+
+### Rationale
+Reduces hallucinated questions.
+Prevents low-quality outputs.
+Allows Python to safely skip unsuitable chunks.

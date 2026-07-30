@@ -323,3 +323,97 @@ Engineering Decisions
 - Prompt engineering becomes easier to maintain when prompts are stored outside application logic.
 - The LLM should only generate educational content while Python is responsible for attaching application-specific metadata such as `chunk_index`.
 - `session_id` and `chunk_index` together uniquely identify the correct source chunk for retrieval during answer evaluation.
+ 
+---
+
+## 23 July 2026
+
+### API and Backend Design
+
+Refined backend architecture and continued documenting data flow before implementation.
+
+### Decisions Made
+
+- Planned controller inputs and outputs before writing implementation.
+
+- Designed service functions based on business logic rather than frontend requirements.
+
+- Continued separating validation, business logic and persistence layers.
+
+### Engineering Notes
+
+Planning request flow before implementation reduced unnecessary refactoring and made function responsibilities much clearer.
+
+---
+
+## 27 July 2026
+
+### Question Generation Pipeline Improvements
+
+Focused on improving the quality of generated quiz questions rather than simply increasing generation speed.
+
+### Decisions Made
+
+- Updated the LLM prompt to prioritize conceptual understanding instead of direct memorization.
+
+- Added explicit instructions for:
+  - Educational content only
+  - Difficulty classification
+  - Topic generation
+  - Empty JSON output for administrative chunks
+
+- Began filtering administrative chunks before question generation to avoid wasting LLM calls.
+
+### Engineering Notes
+
+Filtering irrelevant chunks before generation reduced unnecessary inference cost while improving overall question quality.
+
+---
+
+## 28 July 2026
+
+### Question Generation Coverage
+
+Focused on improving question coverage across uploaded documents.
+
+### Decisions Made
+
+- Introduced random chunk selection before generation to avoid repeatedly generating questions from similar document sections.
+
+- Added configurable question generation per chunk based on document size:
+  - Small documents → more questions per chunk
+  - Medium documents → two questions per chunk
+  - Large documents → one question per chunk
+
+- Decided that quiz coverage should prioritize exposing learners to different document sections rather than generating many questions from the same chunk.
+
+### Engineering Notes
+
+Balancing question generation against document size produces better document coverage while controlling LLM usage.
+
+---
+
+## 29 July 2026
+
+### Pipeline Reliability and Production Readiness
+
+Improved the orchestration logic of the Question Generation Pipeline.
+
+### Decisions Made
+
+- Replaced the original generation loop with a controlled loop that:
+  - Randomizes chunk order
+  - Stops once the target number of questions has been reached
+  - Avoids unnecessary LLM calls after the target has been satisfied
+
+- Introduced a separate `selected_documents` list to preserve the original filtered document collection while safely removing processed chunks during generation.
+
+- Investigated environment issues involving FastAPI, Uvicorn and virtual environments to ensure the correct Python interpreter and package installations were being used.
+
+### Engineering Notes
+
+Separating document selection from the original dataset improved maintainability and made future generation strategies easier to implement.
+
+Debugging virtual environment inconsistencies reinforced the importance of verifying interpreter paths, installed packages and execution environments before investigating application code.
+
+---

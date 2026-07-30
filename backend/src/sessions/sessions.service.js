@@ -16,13 +16,13 @@ export const newSessions = async (document_id,userid) => {
         if(!pdf_path){   
             throw new Error("Make sure you have uploaded the PDF")
         }
-        console.log(pdf_path)
         const sessionId= session.id 
         const file_path= pdf_path.file_path
         const absolutePath = path.resolve(file_path);
       
         //send req to the ai folder which is the bridge between the express and rag-python//
         const questions= await generateQuestions(sessionId,absolutePath)
+        console.log(questions)
         //after getting questions back send the to the questions folder,for them to be saved
         await saveQuestions(sessionId,questions)
         return {id:sessionId}
