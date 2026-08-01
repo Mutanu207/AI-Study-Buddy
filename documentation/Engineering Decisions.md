@@ -430,3 +430,101 @@ Decision
 Reduces hallucinated questions.
 Prevents low-quality outputs.
 Allows Python to safely skip unsuitable chunks.
+
+# Engineering Decisions
+
+## Question Retrieval Architecture
+
+Questions are generated once during session creation by the AI pipeline and stored in PostgreSQL.
+
+The Questions page never communicates directly with the AI service.
+
+Instead, it retrieves saved questions from the backend using the current session ID.
+
+Flow:
+
+Starter Page
+→ Upload PDF
+→ Create Session
+→ Python AI Service
+→ Generate Questions
+→ Save Questions
+→ Questions Page
+→ Fetch Questions from Database
+
+This avoids repeated AI calls and makes question retrieval deterministic.
+
+---
+
+## State Separation
+
+Questions and Answers are intentionally stored separately.
+
+Questions:
+
+- Retrieved from PostgreSQL
+- Read-only
+- Never modified by the frontend
+
+Answers:
+
+- User generated
+- Mutable
+- Updated as the user types
+
+This separation keeps frontend state predictable and simplifies submission.
+
+---
+
+## Answer Payload Structure
+
+Instead of updating backend state after every keystroke, answers are collected locally and transformed into the required payload only when the user ends the quiz.
+
+Payload:
+
+{
+    sessionId,
+    answers: [
+        {
+            questionId,
+            userAnswer
+        }
+    ]
+}
+
+This minimizes API requests and allows validation before submission.
+
+---
+
+## Session Driven Retrieval
+
+The session ID acts as the primary identifier throughout the quiz lifecycle.
+
+It is used to:
+
+- Retrieve questions
+- Submit answers
+- Generate AI feedback
+- Retrieve completed feedback later
+
+All subsequent operations are scoped to a single study session.
+
+---
+
+## Module Responsibilities
+
+Questions Module
+
+- Retrieve stored questions.
+
+Answers Module
+
+- Save submitted answers.
+- Communicate with the AI service for evaluation.
+
+Feedback Module
+
+- Store AI evaluation results.
+- Retrieve completed feedback for presentation.
+
+This keeps each module responsible for one domain while allowing the Answers module to orchestrate the evaluation pipeline.

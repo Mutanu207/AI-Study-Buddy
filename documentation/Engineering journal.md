@@ -417,3 +417,32 @@ Separating document selection from the original dataset improved maintainability
 Debugging virtual environment inconsistencies reinforced the importance of verifying interpreter paths, installed packages and execution environments before investigating application code.
 
 ---
+# Engineering Journal
+
+## Date
+1 August 2026
+
+## Summary
+
+Focused on implementing the Question Retrieval flow and designing the data flow between the Questions, Answers, Feedback and AI modules.
+
+### Work Completed
+
+- Implemented the Questions page layout using Material UI.
+- Created a custom React hook responsible for fetching questions using the session ID.
+- Implemented dynamic routing using `useParams()` to retrieve the current session.
+- Connected the frontend to the backend endpoint for retrieving session questions.
+- Debugged API routing and identified an HTTP method mismatch (`POST` vs `GET`) when fetching questions.
+- Rendered questions dynamically from database data using `Array.map()`.
+- Fixed React list rendering by using unique keys for each question.
+- Designed the frontend answer collection strategy before implementing submission.
+- Planned the payload structure that will be sent to the backend after the quiz is completed.
+- Designed the relationship between Questions, Answers and Feedback modules before implementation.
+
+### Key Learnings
+
+- React list rendering requires the top-level element returned by `map()` to have a unique `key`.
+- Fetching existing resources should use the HTTP GET method instead of POST.
+- Separating immutable data (questions) from mutable user input (answers) results in cleaner state management.
+- Creating payloads only at submission time keeps frontend state simple and reduces unnecessary transformations.
+- Using a dedicated custom hook keeps data fetching logic separate from presentation components.
