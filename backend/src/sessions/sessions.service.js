@@ -1,6 +1,6 @@
 import { createNewSessions,fetchFilePath } from "./sessions.model.js"
 import { generateQuestions } from "../ai/ai.service.js"
-import { saveQuestions } from "../questions/question.service.js"
+import { saveQuestions } from "../questions/questions.service.js"
 import path from "path";
 export const newSessions = async (document_id,userid) => {
     try{
