@@ -72,8 +72,9 @@ function StarterPage() {
             severity: "success"
         });
         setFiles(null) //clear the file state after upload//
+        console.log("Session created successfully:", response.sessionId);
            setTimeout(() => {
-            navigate(`/questions/${response.sessionId}`);
+            navigate(`/questions/${response.sessionId.id}`);
         }, 1500); 
         }
         catch(error){
