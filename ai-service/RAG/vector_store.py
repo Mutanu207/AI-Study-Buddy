@@ -68,7 +68,7 @@ class VectorStoreManager:
             embeddings
         )
 
-        self.documents = documents
+        self.documents = documents #self.documents is a list of Document objects, which are stored in the vector store memory for later retrieval.
 
         logger.info(
             "Embeddings stored successfully."
