@@ -16,14 +16,14 @@ function Questions() {
     const handleAnswerChange = (questionId, answer) => {
     setAnswers((previousAnswers) => ({
         ...previousAnswers,
-        [questionId]: answer,
+        [questionId]: answer, //Bound the answer to the questionId
     }));}
     const payload = {
                 sessionId,
 
                 answers: questions.map((question) => ({
                     questionId: question.id,
-                    userAnswer: answers[question.id] || "",
+                    userAnswer: answers[question.id] || "",//grab the answer from the answers state, if not present, default to an empty string grab using the questionId as the key                        
                 })),
             };
             console.log(payload)
@@ -39,33 +39,84 @@ function Questions() {
 
 if (loading) return  <Typography variant="h6" align="center" sx={{ mt: 4 }}>Loading...</Typography>;
     return (
-       <Box>
-        <Box sx={{
-                    m:4,
-                    p:3,
-                    border: "5px solid #1A1A40",
-                    borderRadius: "36px",
+       <Box sx={{ background: "linear-gradient(180deg,#F8F5FF 0%, #EEF4FF 100%)" ,
+                    minHeight: "100vh",
+                     py: 6,
 
-        }}>
-            <Box>
-                <Typography sx={{textAlign:"center",
-                                fontSize:"2rem",
-                                fontWeight:"bold"}}
-                >PRACTICE QUIZ</Typography>
+       }}>
+        <Box sx={{
+                    maxWidth: "1000px",
+                    mx: "auto",
+                    my: 5,
+                    px: 5,
+                    py: 5,
+                    bgcolor: "#FFFFFF",
+                    borderRadius: "24px",
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.08)"}}>
+            <Box sx={{ mb: 5 }}>
+                <Typography
+                    variant="h3"
+                    fontWeight="bold"
+                    fontColor="#1A1A40"
+                >
+                    Practice Quiz
+                </Typography>
+
+                <Typography
+                    color="text.secondary"
+                >
+                    Answer all questions to the best of your ability.
+                </Typography>
             </Box>
             {questions.map((question, index) => (
-            <Box key={question.id} sx={{ mt: 4 }}>
+            <Box key={question.id} sx={{ border: "1px solid #ECECEC",
+                                        borderRadius: "18px",
+                                        p: 3,
+                                        mb: 4,
+                                        boxShadow: "0 2px 6px rgba(0,0,0,.05)"}}>
                
-                <Typography>{index + 1}. {question.question}</Typography>
+                                <Box
+                                sx={{
+                                    width: 40,
+                                    height: 40,
+                                    borderRadius: "50%",
+                                    bgcolor: "#EDE9FE",
+                                    color: "#5B21B6",
+
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+
+                                    fontWeight: "bold",
+
+                                    flexShrink: 0,
+                                }}
+                            >
+                                {index + 1}
+                            </Box>
+
+                            <Typography
+                                sx={{
+                                    fontSize: "1.05rem",
+                                    fontWeight: "bold",
+                                    color: "#1A1A40",
+                                    
+                                }}
+                            >
+                                {question.question}
+                            </Typography>
             <TextField
                     placeholder="Input answer"
                     multiline
                     rows={4}
                     sx={{
-                    width: "500px",
+                    width: "100%",
                     "& .MuiOutlinedInput-root": {
-                    borderRadius: "20px",
-
+                        borderRadius: "16px",
+                        border: "1px solid #CBD5E1",
+                        backgroundColor: "#FAFAFC",
+                        padding: "10px",
+                        transition: "0.2s",
                     "& fieldset": {
                         borderColor: "#1A1A40",
                     },
@@ -73,6 +124,10 @@ if (loading) return  <Typography variant="h6" align="center" sx={{ mt: 4 }}>Load
                     "&:hover fieldset": {
                         borderColor: "#1A1A40",
                     },
+                     "&.Mui-focused fieldset": {
+                        borderColor: "#7C3AED",
+                        borderWidth: "2px",
+            },
                         },
                     }}
                         onChange={(event) =>
@@ -86,9 +141,14 @@ if (loading) return  <Typography variant="h6" align="center" sx={{ mt: 4 }}>Load
             <Box 
                 sx={{
                     display:"flex",
-                    justifyContent:"flex-end"
+                    flexDirection:"column",
+                    alignItems:"center",
+                    mt:4
                 }}>
-                <PrimaryButton color="#fff" background= "#00800" size="large" onClick={sendAnswers}> End Quiz </PrimaryButton>
+                <PrimaryButton color="#fff" background= "#5B21B6" size="large" px={6} onClick={sendAnswers}
+                       sx={{height: "50px", width: "200px"}}> Submit Quiz </PrimaryButton>
+                <Typography color="text.secondary" align="center" sx={{mt:2}} >
+                Your answers will be submitted for AI evaluation.</Typography>
             </Box>
         </Box>
        </Box>

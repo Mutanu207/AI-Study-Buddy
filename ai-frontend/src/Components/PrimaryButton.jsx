@@ -10,7 +10,8 @@ function PrimaryButton(props){
                border: "2px $background solid",
                borderRadius: "10px",
                color: props.color,
-               fontWeight: 'bold'
+               fontWeight: 'bold',
+               px: props.px,
             }}>
             {props.children}
         </Button>
