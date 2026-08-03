@@ -528,3 +528,231 @@ Feedback Module
 - Retrieve completed feedback for presentation.
 
 This keeps each module responsible for one domain while allowing the Answers module to orchestrate the evaluation pipeline.
+# Engineering Decisions
+
+**Date:** 03 August 2026
+
+---
+
+# Decision 1
+
+## Separate Question Generation from Answer Evaluation
+
+### Decision
+
+Create a dedicated `evaluation` module instead of placing answer evaluation inside the existing RAG module.
+
+### Reason
+
+Question Generation and Answer Evaluation solve different problems.
+
+Question Generation pipeline:
+
+```
+PDF
+        ↓
+Chunking
+        ↓
+Embeddings
+        ↓
+Question Generation
+        ↓
+Validation
+```
+
+Answer Evaluation pipeline:
+
+```
+Student Answer
+        ↓
+Context Retrieval
+        ↓
+Answer Evaluation
+        ↓
+Feedback Validation
+```
+
+Separating these modules improves maintainability and allows each pipeline to evolve independently.
+
+---
+
+# Decision 2
+
+## Restrict Generator Input
+
+### Decision
+
+Only send the following information to the LLM:
+
+```python
+{
+    "question",
+    "reference_answer",
+    "retrieved_context",
+    "user_answer"
+}
+```
+
+### Reason
+
+The LLM does not require:
+
+- session_id
+- answer_id
+- chunk_index
+
+These values are application metadata and should remain inside the evaluation pipeline.
+
+Keeping prompts focused reduces unnecessary information and improves separation of responsibilities.
+
+---
+
+# Decision 3
+
+## Pipeline Owns Metadata
+
+### Decision
+
+The evaluation pipeline is responsible for attaching metadata to the LLM response.
+
+Generator returns:
+
+```python
+{
+    "is_correct",
+    "feedback"
+}
+```
+
+Pipeline produces:
+
+```python
+{
+    "answer_id",
+    "is_correct",
+    "feedback",
+    "retrieved_context"
+}
+```
+
+### Reason
+
+The Generator should only evaluate answers.
+
+The Pipeline is responsible for application-specific data.
+
+---
+
+# Decision 4
+
+## Dedicated Feedback Table
+
+### Decision
+
+Store evaluation results inside a separate Feedback table.
+
+Feedback record:
+
+```text
+feedback_id
+
+answer_id
+
+is_correct
+
+feedback
+
+retrieved_context
+```
+
+### Reason
+
+This normalizes the database.
+
+The Feedback table references Answers through `answer_id`, avoiding duplication while supporting session history.
+
+---
+
+# Decision 5
+
+## Session ID Returned Once
+
+### Decision
+
+Return `session_id` only once in the final evaluation payload instead of including it inside every feedback object.
+
+Returned payload:
+
+```json
+{
+    "session_id": 28,
+    "feedback": [
+        {
+            "answer_id": 1,
+            "is_correct": true,
+            "feedback": "...",
+            "retrieved_context": "..."
+        }
+    ]
+}
+```
+
+### Reason
+
+A session contains many answers.
+
+Repeating the same Session ID inside every feedback object introduces unnecessary duplication.
+
+---
+
+# Decision 6
+
+## Separate AI Pipelines
+
+### Decision
+
+Create two independent AI modules.
+
+```
+ai-service/
+
+question_generation/
+
+evaluation/
+```
+
+### Reason
+
+Question generation and answer evaluation have different responsibilities.
+
+Keeping them separate improves readability, maintainability and future scalability.
+
+Future AI capabilities such as Flashcards, Summaries and Study Plans can follow the same modular architecture.
+
+---
+
+# Decision 7
+
+## Temporary In-Memory Retrieval
+
+### Decision
+
+Use the existing in-memory FAISS vector store during MVP development.
+
+### Reason
+
+The immediate objective is validating the complete end-to-end workflow:
+
+```
+Upload PDF
+        ↓
+Generate Questions
+        ↓
+Answer Questions
+        ↓
+Evaluate Answers
+        ↓
+Display Feedback
+```
+
+Persistent vector storage will be introduced during the planned migration to pgvector after the MVP has been completed and verified.

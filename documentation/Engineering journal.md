@@ -446,3 +446,163 @@ Focused on implementing the Question Retrieval flow and designing the data flow 
 - Separating immutable data (questions) from mutable user input (answers) results in cleaner state management.
 - Creating payloads only at submission time keeps frontend state simple and reduces unnecessary transformations.
 - Using a dedicated custom hook keeps data fetching logic separate from presentation components.
+
+# Engineering Journal
+
+**Date:** 03 August 2026
+
+---
+
+## Objective
+
+Complete the Questions page, implement the answer submission flow, and design the Answer Evaluation pipeline.
+
+---
+
+## Work Completed
+
+### Frontend
+
+- Completed the Practice Quiz page UI using Material UI.
+- Redesigned the page into a card-based layout with improved spacing and typography.
+- Added dynamic rendering of questions using the fetched session questions.
+- Implemented answer state management where each answer is mapped to its corresponding question ID.
+- Built the payload that will be submitted to the backend.
+
+```json
+{
+    "sessionId": "...",
+    "answers": [
+        {
+            "questionId": "...",
+            "userAnswer": "..."
+        }
+    ]
+}
+```
+
+---
+
+### Backend
+
+Implemented the complete answer submission flow.
+
+Current flow:
+
+```
+Frontend
+        ↓
+Answers Controller
+        ↓
+Answers Service
+        ↓
+Answers Model
+        ↓
+Save answers into Answers table
+        ↓
+Retrieve Question Context
+        ↓
+Build evaluation payload
+        ↓
+AI Service
+```
+
+The Answers Service now:
+
+- Saves each user answer.
+- Retrieves the corresponding question information.
+- Retrieves the reference answer.
+- Retrieves the chunk index.
+- Enriches every saved answer with the retrieved information.
+- Builds the payload that will be forwarded to the AI Service.
+
+Example payload:
+
+```json
+{
+    "session_id": 28,
+    "answers": [
+        {
+            "answer_id": 1,
+            "question": "...",
+            "reference_answer": "...",
+            "chunk_index": 4,
+            "user_answer": "..."
+        }
+    ]
+}
+```
+
+---
+
+## AI Evaluation Pipeline Design
+
+Designed the Answer Evaluation pipeline.
+
+Current architecture:
+
+```
+Node
+
+↓
+
+AI Service
+
+↓
+
+Python
+
+↓
+
+Pipeline
+
+↓
+
+Retriever
+
+↓
+
+Generator
+
+↓
+
+Validator
+
+↓
+
+Return Feedback
+```
+
+Pipeline responsibilities:
+
+- Loop through every answer.
+- Retrieve the original chunk using the stored chunk index.
+- Send only the required information to the LLM.
+- Merge AI output with application metadata.
+- Return a structured feedback payload to Node.
+
+---
+
+## Challenges
+
+- Determining which information should be sent to the LLM.
+- Separating application metadata from evaluation data.
+- Designing a clean architecture for the evaluation pipeline.
+
+---
+
+## Solutions
+
+- Removed Answer IDs and Session IDs from the LLM input.
+- Kept metadata management inside the pipeline.
+- Designed Retriever, Generator and Validator as independent modules with single responsibilities.
+
+---
+
+## Next Steps
+
+- Implement `retriever.py`.
+- Implement `generator.py`.
+- Implement `validator.py`.
+- Complete the evaluation pipeline.
+- Save evaluation results into the Feedback table.
