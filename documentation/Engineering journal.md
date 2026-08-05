@@ -606,3 +606,186 @@ Pipeline responsibilities:
 - Implement `validator.py`.
 - Complete the evaluation pipeline.
 - Save evaluation results into the Feedback table.
+
+# Engineering Journal
+
+## Date
+2026-08-04
+
+## Objective
+
+Continue building the Answer Evaluation Pipeline responsible for evaluating learner responses after they have completed a quiz.
+
+---
+
+## Work Completed
+
+### Completed the Evaluation Generator
+
+Implemented a dedicated `EvaluationGenerator` class by extending the shared `Generator` class used in the Question Generation Pipeline.
+
+This allowed reuse of:
+
+- Groq client initialization
+- LLM communication logic
+- JSON parsing
+- Error handling
+
+while introducing a separate evaluation-specific method.
+
+---
+
+### Refactored LLM Communication
+
+Refactored the original generator to make `_call_llm()` reusable.
+
+Instead of hardcoding the Question Generation system prompt inside the base Generator class, the system prompt is now passed as a parameter.
+
+This allows multiple pipelines to share the same LLM communication layer while using different prompts.
+
+---
+
+### Designed Evaluation Prompt
+
+Created a dedicated evaluation prompt capable of:
+
+- Comparing the student's answer with the reference answer.
+- Validating the answer using retrieved context.
+- Returning educational feedback.
+- Returning the concept tested.
+- Returning a boolean correctness flag.
+
+The prompt was refined to encourage evidence-based feedback instead of simply marking answers as correct or incorrect.
+
+---
+
+### Built Feedback Validator
+
+Implemented validation rules to ensure every LLM response contains:
+
+- is_correct
+- concept
+- feedback
+
+This protects downstream services from malformed model outputs.
+
+---
+
+### Built Evaluation Pipeline
+
+Designed the overall evaluation pipeline consisting of:
+
+Student Answers
+        ↓
+Retriever
+        ↓
+Generator
+        ↓
+Validator
+        ↓
+Formatted Feedback Response
+
+The pipeline processes each learner answer individually while preserving the answer_id for later storage.
+
+---
+
+## Lessons Learned
+
+Separating responsibilities across Generator, Validator and Pipeline makes the system easier to maintain.
+
+Reusing the base Generator avoids duplicate Groq integration code while still allowing different prompts for different AI tasks.
+
+Prompt quality has a major impact on the educational usefulness of generated feedback.
+
+# Engineering Journal
+
+## Date
+2026-08-05
+
+## Objective
+
+Migrate the retrieval layer from FAISS to PostgreSQL with pgvector to create a persistent vector store shared across both the Question Generation and Answer Evaluation pipelines.
+
+---
+
+## Work Completed
+
+### Installed pgvector
+
+Installed the PostgreSQL pgvector extension and enabled vector support inside the project database.
+
+Verified that the extension was successfully available for use.
+
+---
+
+### Designed Chunk Storage
+
+Created a new database table responsible for storing document chunks.
+
+Each stored record contains:
+
+- session_id
+- chunk_index
+- text
+- embedding (vector)
+
+This replaces the temporary FAISS-based storage previously used during runtime.
+
+---
+
+### Created Database Layer
+
+Added a dedicated database module responsible for:
+
+- Saving a single chunk.
+- Saving all chunks generated during document ingestion.
+- Retrieving chunks using session_id and chunk_index.
+
+Separating database logic from the retrieval pipeline keeps persistence independent from AI logic.
+
+---
+
+### Refactored Retrieval Architecture
+
+Began removing FAISS dependencies from the retrieval pipeline.
+
+Instead of retrieving vectors from an in-memory index, the system now retrieves the original document chunk directly from PostgreSQL using:
+
+(session_id, chunk_index)
+
+This better matches the Answer Evaluation workflow where the relevant chunk is already known.
+
+---
+
+### Began Integration
+
+Updated the Question Generation pipeline to persist embeddings and chunks immediately after embedding generation.
+
+Updated the Evaluation Retriever to use PostgreSQL instead of FAISS.
+
+---
+
+### Debugging
+
+Encountered multiple integration issues during migration including:
+
+- Tensor serialization errors when inserting embeddings into PostgreSQL.
+- Request validation issues between Express and FastAPI.
+- Payload structure mismatches.
+- Evaluation endpoint request debugging.
+
+Although the migration is largely complete, final debugging remains before end-to-end evaluation testing.
+
+---
+
+## Lessons Learned
+
+Using PostgreSQL as the source of truth simplifies the overall architecture.
+
+Unlike FAISS, pgvector provides:
+
+- persistent storage
+- shared access across services
+- simpler retrieval for known chunk references
+
+The migration also highlighted the importance of clearly separating persistence, retrieval and AI inference responsibilities.

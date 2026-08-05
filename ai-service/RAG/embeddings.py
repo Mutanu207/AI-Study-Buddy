@@ -64,7 +64,7 @@ class EmbeddingManager:
 
             batch_size=16,
 
-            convert_to_numpy=False,
+            convert_to_numpy=True,
 
             show_progress_bar=True,
 
@@ -75,7 +75,7 @@ class EmbeddingManager:
         logger.info(
             "Successfully generated embeddings."
         )
-
-        return embeddings
+#returns list of embeddings, each embedding is a list of floats 
+        return [embedding.tolist()for embedding in embeddings]
     
    

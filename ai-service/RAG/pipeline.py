@@ -7,10 +7,9 @@ from .cleaner import clean_text
 from .splitter import split_text
 
 from .embeddings import EmbeddingManager
-from .vector_store import VectorStoreManager
-
 from .generator import Generator
 from .validator import QuestionValidator
+from database.chunk_model import save_chunks
 import random
 
 logger = logging.getLogger(__name__)
@@ -85,8 +84,6 @@ class QuestionGenerationPipeline:
 
         self.embedding_manager = EmbeddingManager()
 
-        self.vector_store = VectorStoreManager()
-
         self.generator = Generator()
 
         self.validator = QuestionValidator()
@@ -146,7 +143,7 @@ class QuestionGenerationPipeline:
                 session_id=session_id,
 
             )
-
+#when we split we get back documents[list] which has Documents objects which have the spliited text chunk and its metdata
             logger.info(
 
             "Generated %d document chunks.",
@@ -166,18 +163,12 @@ class QuestionGenerationPipeline:
             )
 
     # Store embeddings inside the vector database
-   
-            self.vector_store.store_embeddings(
-
-                documents=documents,
-
-                vectors=vectors
-
-                )
-
-            logger.info(
-            "Embeddings stored successfully."
+            save_chunks(
+            session_id=session_id,
+            documents=documents,
+            embeddings=vectors
             )
+
         #before generating questions, filter out chunks that contain administrative content
             filtered_documents = []
 

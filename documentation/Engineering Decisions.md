@@ -756,3 +756,135 @@ Display Feedback
 ```
 
 Persistent vector storage will be introduced during the planned migration to pgvector after the MVP has been completed and verified.
+
+# Engineering Decisions
+
+## Date
+2026-08-04
+
+---
+
+## Decision
+
+Refactor the shared Generator class instead of creating two independent LLM clients.
+
+### Reason
+
+Both Question Generation and Answer Evaluation use the same LLM provider and configuration.
+
+Creating separate clients would duplicate:
+
+- API initialization
+- Error handling
+- JSON parsing
+
+Passing the system prompt as a parameter allows the same infrastructure to support multiple AI tasks.
+
+---
+
+## Decision
+
+Return "concept" from the LLM instead of relying only on stored question topics.
+
+### Reason
+
+Question topics stored during generation are intentionally broad.
+
+Returning the exact concept tested allows feedback to direct learners toward a much narrower revision target.
+
+Example:
+
+Topic:
+Emotional Problems
+
+Concept:
+Aggressive behaviour as a response to emotional distress
+
+The concept provides more actionable revision guidance.
+
+---
+
+## Decision
+
+Keep answer_id outside the LLM prompt.
+
+### Reason
+
+The LLM does not need database identifiers.
+
+Passing answer_id to the model wastes tokens and increases prompt size.
+
+Instead, answer_id is reattached after evaluation before returning results.
+
+# Engineering Decisions
+
+## Date
+2026-08-05
+
+---
+
+## Decision
+
+Replace FAISS with PostgreSQL + pgvector.
+
+### Reason
+
+The application already stores session information in PostgreSQL.
+
+Persisting embeddings in the same database:
+
+- removes dependency on temporary in-memory indexes
+- survives application restarts
+- allows future similarity search directly inside PostgreSQL
+- simplifies deployment
+
+---
+
+## Decision
+
+Store document text alongside embeddings.
+
+Schema:
+
+- session_id
+- chunk_index
+- text
+- embedding
+
+### Reason
+
+The Answer Evaluation Pipeline requires the original text chunk to generate feedback.
+
+Storing text with embeddings eliminates the need to reconstruct chunks from uploaded files.
+
+---
+
+## Decision
+
+Retrieve evaluation context using session_id and chunk_index.
+
+### Reason
+
+Unlike Retrieval-Augmented Generation where similarity search is required, Answer Evaluation already knows which chunk generated each question.
+
+Direct lookup is:
+
+- deterministic
+- faster
+- cheaper
+- simpler
+
+Similarity search remains available for future features but is unnecessary for evaluation.
+
+---
+
+## Decision
+
+Create a dedicated database package.
+
+### Reason
+
+Database operations should remain independent from AI pipelines.
+
+This separation allows future database changes without modifying retrieval or generation logic.
+
