@@ -31,6 +31,7 @@ function Questions() {
         try {
             const response= await saveAnswers(payload);
             console.log("Answers saved successfully:", response);
+            alert(response.message)
 
         } catch (error) {
             console.error("Error saving answers:", error);
