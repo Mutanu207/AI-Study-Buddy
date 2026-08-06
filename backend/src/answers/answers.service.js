@@ -1,5 +1,6 @@
 import { saveUserAnswers, getAnswerContext } from "./answers.model.js";
 import { evaluateAnswers } from "../ai/ai.service.js";
+import { receiveFeedback } from "../feedback/feedback.service.js";
 export const userAnswers = async (sessionId, answers) => { //answers is an array
     try {
         const answersForEvaluation = [];
@@ -29,7 +30,10 @@ export const userAnswers = async (sessionId, answers) => { //answers is an array
         console.log(payload)
         //send to ai folder which bridges to the python server what we get back is the feedback
         const feedback= await evaluateAnswers(payload);
-        console.log("Feedback from AI evaluation:", feedback);
+        console.log("Feedback from AI evaluation:", feedback); 
+        //send feedback from ai to feedback folder
+        await receiveFeedback(feedback)
+
         
     } catch (error) {
         console.error("Error saving answers:", error);
