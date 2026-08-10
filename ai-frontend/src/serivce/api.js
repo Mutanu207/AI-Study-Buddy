@@ -92,4 +92,10 @@ export const saveAnswers = async (payload) => {
     return result.data;
 };
 
+export const fetchFeedback =async (sessionId) => {
+    const result= await api.get(`/feedback/fetch/${sessionId}`)
+    console.log(result.data)
+    return result.data;
+}
+
 

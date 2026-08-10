@@ -1,3 +1,4 @@
+import  pool  from "../config/dbConfig.js"
 export const saveFeedback= async (feedbackData) => {
     const {session_id, feedback} = feedbackData
     for (const item of feedback){
@@ -7,3 +8,27 @@ export const saveFeedback= async (feedbackData) => {
         )
     }
 }
+export const getUserFeedback= async (sessionId) => {
+    const result = await pool.query(
+        `
+        SELECT
+            f.answer_id,
+            q.question,
+            a.user_answer,
+            f.feedback,
+            f.retrieved_context,
+            f.is_correct,
+            f.concept
+        FROM feedback f
+        JOIN answers a
+            ON f.answer_id = a.id
+        JOIN questions q
+            ON a.question_id = q.id
+        WHERE f.session_id = $1
+        ORDER BY f.answer_id;
+        `,
+        [sessionId]
+    );
+
+    return result.rows;
+};

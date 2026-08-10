@@ -9,6 +9,7 @@ import Sessions from "./Pages/Sessions";
 import Dashboard from "./Pages/Dashboard"
 import About from "./Pages/About"
 import Questions from "./Pages/Questions"
+import Feedback from "./Pages/Feedback";
 function App() {
   return (
     <Routes>
@@ -21,6 +22,7 @@ function App() {
       <Route path="/sessions" element={<ProtectedRoute><Sessions /></ProtectedRoute>} /> 
       <Route path="/about" element={<ProtectedRoute><About /></ProtectedRoute>} />
       <Route path="/questions/:sessionId" element={<ProtectedRoute><Questions /></ProtectedRoute>} />
+      <Route path= "/feedback/:sessionId" element= {<ProtectedRoute><Feedback /></ProtectedRoute>} />
     </Routes>
   );
 };

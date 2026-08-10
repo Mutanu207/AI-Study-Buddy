@@ -6,13 +6,23 @@ import { useParams } from "react-router-dom";
 import { useFetchQuestions } from "../hooks/fetchQuestions.jsx";
 import { useState } from "react";
 import { saveAnswers } from "../serivce/api.js";
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
+import { useNavigate } from "react-router-dom";
+
 function Questions() {
+    const navigate= useNavigate();
     const { sessionId } = useParams();
-    const {
-        questions,
-        loading
-    } = useFetchQuestions(sessionId)
+    const {questions,loading} = useFetchQuestions(sessionId)
     const [answers, setAnswers]= useState({});
+     //setting up notifications
+    const [notification, setNotification] =useState({
+                open: false,
+                message: "",
+                severity: "success"
+            })
+    const [loadingSession, setLoadingSession]= useState(false)
+    //functions        
     const handleAnswerChange = (questionId, answer) => {
     setAnswers((previousAnswers) => ({
         ...previousAnswers,
@@ -28,17 +38,33 @@ function Questions() {
             };
             console.log(payload)
     const sendAnswers = async () => {
+        // if its true it means user has pressed it the first time already, for the first time its false so the function will execute
+        if(loadingSession){
+            return;
+        }
+        setLoadingSession(true)
         try {
             const response= await saveAnswers(payload);
+            setNotification({
+            open: true,
+            message: response.message,
+            severity: "success"
+             });
+            setTimeout(() => {
+            navigate(`/feedback/${response.sessionId}`);
+        }, 1500); 
             console.log("Answers saved successfully:", response);
-            alert(response.message)
-
         } catch (error) {
-            console.error("Error saving answers:", error);
+            setNotification({
+            open: true,
+            message: error.response?.data?.message || "Failed to start session",
+            severity: "error"
+            })
+            setLoadingSession(false);
         }
     }
 
-if (loading) return  <Typography variant="h6" align="center" sx={{ mt: 4 }}>Loading...</Typography>;
+    if (loading) return  <Typography variant="h6" align="center" sx={{ mt: 4 }}>Loading...</Typography>;
     return (
        <Box sx={{ background: "linear-gradient(180deg,#F8F5FF 0%, #EEF4FF 100%)" ,
                     minHeight: "100vh",
@@ -146,12 +172,29 @@ if (loading) return  <Typography variant="h6" align="center" sx={{ mt: 4 }}>Load
                     alignItems:"center",
                     mt:4
                 }}>
-                <PrimaryButton color="#fff" background= "#5B21B6" size="large" px={6} onClick={sendAnswers}
+                <PrimaryButton color="#fff" background= "#5B21B6" size="large" px={6} onClick={sendAnswers} disabled={loadingSession}
                        sx={{height: "50px", width: "200px"}}> Submit Quiz </PrimaryButton>
                 <Typography color="text.secondary" align="center" sx={{mt:2}} >
                 Your answers will be submitted for AI evaluation.</Typography>
             </Box>
         </Box>
+
+
+        <Snackbar
+                open={notification.open}
+                autoHideDuration={3000}
+                 onClose={() => setNotification(prev => ({ ...prev, open: false }))}
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+                    >
+                <Alert
+                    severity={
+                    notification.severity
+                               }
+                    variant="filled">
+                           
+                    {notification.message} 
+                    </Alert>
+                       </Snackbar>
        </Box>
     );
 }
