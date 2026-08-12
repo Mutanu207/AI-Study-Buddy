@@ -8,7 +8,7 @@ function Feedback () {
     const {sessionId}= useParams();
     //send session id to hook function which uses it to grab questions and get feedback back
     const{ feedback,loading}= useFetchFeedback(sessionId)
-    if (loading) return  <Typography variant="h6" align="center" sx={{ mt: 4 }}>Loading...</Typography>;
+    if (loading) return  <Typography variant="h6" align="center" sx={{ mt: 4 }}> Loading...</Typography>;
     return (
         <Box
             sx={{
@@ -29,7 +29,7 @@ function Feedback () {
 
                 <Box>
                     <Typography
-                         variant="h3" fontWeight="bold" fontColor="#1A1A40">Feedback Review </Typography>
+                         variant="h3" fontWeight="bold" sx={{color:"#1A1A40"}}>Feedback Review </Typography>
                     <Typography color="text.secondary">Review your answers and feedback given</Typography>
                 </Box>
                 {feedback.map((item,index) =>(
@@ -37,6 +37,7 @@ function Feedback () {
                                         borderRadius: "18px",
                                         p: 3,
                                         mb: 4,
+                                        gap:3,
                                         boxShadow: "0 2px 6px rgba(0,0,0,.05)"}}> 
                                         
                         <Box
@@ -58,29 +59,25 @@ function Feedback () {
                             >
                                 {index + 1}
                             </Box>
-                             <Typography>
-                             <span style={{fontSize: "1.05rem",fontWeight: "bold",color: "#1A1A40",}}>Question</span>
+                             <Typography sx={{mb:3}}>
+                             <span style={{fontSize: "1.05rem",fontWeight: "bold",color: "#1A1A40",}}>Question: </span>
                              {item.question}
                             </Typography>
-                             <Typography>
-                             <span style={{fontSize: "1.05rem",fontWeight: "bold",color: "#1A1A40",}}>Answer</span>
+                             <Typography sx={{mb:3}}>
+                             <span style={{fontSize: "1.05rem",fontWeight: "bold",color: "#1A1A40",}}>Answer: </span>
                              {item.user_answer}
                             </Typography>
-                             <Typography>
-                             <span style={{fontSize: "1.05rem",fontWeight: "bold",color: "#1A1A40",}}>Feedback</span>
+                             <Typography sx={{mb:3}}>
+                             <span style={{fontSize: "1.05rem",fontWeight: "bold",color: "#1A1A40",}}>Feedback: </span>
                              {item.feedback}
                             </Typography>
-                            <Typography className={item.is_correct ? "bg-green-100 text-green-700": "bg-red-100 text-red-700"}
-                             sx={{fontSize: "1.05rem",fontWeight: "bold",}}>
+                            <Typography
+                             sx={{fontSize: "1.05rem",fontWeight: "bold",mb:3, color:item.is_correct ? "#15803D" : "#B91C1C"}}>
                                 Mark: {item.is_correct ? "Correct" : "Incorrect"}
                             </Typography>
-                             <Typography>
-                             <span style={{fontSize: "1.05rem",fontWeight: "bold",color: "#1A1A40",}}>Document content</span>
-                             {item.retrived_context}
-                            </Typography>
-                             <Typography>
-                             <span style={{fontSize: "1.05rem",fontWeight: "bold",color: "#1A1A40",}}>Concept</span>
-                             {item.concpet}
+                             <Typography sx={{mb:3}}>
+                             <span style={{fontSize: "1.05rem",fontWeight: "bold",color: "#1A1A40",}}>Concept: </span>
+                             {item.concept}
                             </Typography>
                     </Box>))} 
                        <Box sx={{
