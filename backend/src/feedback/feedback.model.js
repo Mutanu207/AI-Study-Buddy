@@ -12,11 +12,10 @@ export const getUserFeedback= async (sessionId) => {
     const result = await pool.query(
         `
         SELECT
-            f.answer_id,
+            f.id,
             q.question,
             a.user_answer,
             f.feedback,
-            f.retrieved_context,
             f.is_correct,
             f.concept
         FROM feedback f

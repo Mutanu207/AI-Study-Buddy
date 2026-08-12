@@ -1,7 +1,7 @@
 import { fetchUserFeedback } from "./feedback.service.js";
 export const fetchFeedback = async (req,res) => {
     try{
-    const {sessionId} = useParams();
+    const {sessionId} = req.params;
     if (!sessionId){
         return res.status(400).json({ message: "No session id" });
     }
