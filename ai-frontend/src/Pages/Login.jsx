@@ -4,7 +4,7 @@ import Container from "@mui/material/Container";
 import PrimaryButton from "../Components/PrimaryButton"; 
 import TextField from "@mui/material/TextField";
 import Link from "@mui/material/Link";
-import { GOOGLE_AUTH_URL,loginUser} from "../serivce/api";
+import { GOOGLE_AUTH_URL,loginUser} from "../service/api";
 import { Link as RouterLink } from "react-router-dom";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";

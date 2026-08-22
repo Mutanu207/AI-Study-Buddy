@@ -62,3 +62,9 @@ export const createQuestion = async (
     await pool.query(query, values);
 
 };
+
+export const getQuestionsBySessionId = async (sessionId) => {
+    const result = await pool.query("SELECT id, question FROM questions WHERE session_id = $1", [sessionId]);
+    console.log("Fetched questions:", result.rows); //should return an array of questions with id and question text
+    return result.rows;
+}

@@ -7,6 +7,9 @@ import authRoutes from "./auth/auth.route.js";
 import userRoutes from "./user/user.route.js";
 import documentsRoutes from "./documents/documents.route.js"
 import sessionsRoutes from "./sessions/sessions.route.js"
+import questionsRoutes from "./questions/questions.route.js"
+import answersRoutes from "./answers/answers.route.js"
+import feedbackRoutes from "./feedback/feedback.route.js"
 const app = express();
 app.use(cors(corsOptions)); //cors config
 app.use(cookieParser()); //phase 3 cookies
@@ -17,4 +20,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/documents", documentsRoutes)
 app.use("/api/sessions", sessionsRoutes)
+app.use("/api/questions", questionsRoutes)
+app.use("/api/answers", answersRoutes)
+app.use("/api/feedback", feedbackRoutes)
 export default app;

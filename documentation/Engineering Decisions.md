@@ -382,3 +382,560 @@ Retrieve supporting context during answer evaluation using both `session_id` and
 - Chunk indexes are only unique within a single uploaded document.
 - Session IDs uniquely identify each uploaded PDF.
 - Combining both guarantees retrieval from the correct document and prevents collisions between different study sessions.
+
+### Chunk Filtering Before Question Generation
+### Decision
+
+Filter document chunks that contain administrative or non-educational content before sending them to the LLM.
+
+### Rationale
+Reduces unnecessary LLM calls.
+Prevents generating questions from irrelevant sections such as references or course metadata.
+Improves overall question quality.
+Lowers inference cost.
+
+### Adaptive Question Generation
+### Decision
+
+Generate a variable number of questions per chunk depending on the number of educational chunks extracted from the uploaded document.
+
+### Rationale
+Small documents require more questions per chunk to achieve reasonable quiz coverage.
+Large documents require fewer questions per chunk to maximize topic diversity.
+Prevents over-representing a single chunk while still targeting a fixed quiz size.
+Randomized Chunk Selection
+Decision
+
+### Shuffle educational chunks before question generation.
+
+### Rationale
+Prevents the quiz from always covering only the beginning of a document.
+Improves coverage across different topics.
+Produces more varied quizzes between study sessions.
+Python Controls Quiz Size
+Decision
+
+### Allow Python, rather than the LLM, to determine when sufficient questions have been generated.
+
+### Rationale
+Keeps quiz size deterministic.
+Prevents unnecessary LLM calls once the target number of questions has been reached.
+Separates generation logic from orchestration logic.
+Educational-Only Prompt Strategy
+Decision
+
+### Explicitly instruct the LLM to ignore administrative content and return an empty JSON array when a chunk cannot produce meaningful educational questions.
+
+### Rationale
+Reduces hallucinated questions.
+Prevents low-quality outputs.
+Allows Python to safely skip unsuitable chunks.
+
+# Engineering Decisions
+
+## Question Retrieval Architecture
+
+Questions are generated once during session creation by the AI pipeline and stored in PostgreSQL.
+
+The Questions page never communicates directly with the AI service.
+
+Instead, it retrieves saved questions from the backend using the current session ID.
+
+Flow:
+
+Starter Page
+→ Upload PDF
+→ Create Session
+→ Python AI Service
+→ Generate Questions
+→ Save Questions
+→ Questions Page
+→ Fetch Questions from Database
+
+This avoids repeated AI calls and makes question retrieval deterministic.
+
+---
+
+## State Separation
+
+Questions and Answers are intentionally stored separately.
+
+Questions:
+
+- Retrieved from PostgreSQL
+- Read-only
+- Never modified by the frontend
+
+Answers:
+
+- User generated
+- Mutable
+- Updated as the user types
+
+This separation keeps frontend state predictable and simplifies submission.
+
+---
+
+## Answer Payload Structure
+
+Instead of updating backend state after every keystroke, answers are collected locally and transformed into the required payload only when the user ends the quiz.
+
+Payload:
+
+{
+    sessionId,
+    answers: [
+        {
+            questionId,
+            userAnswer
+        }
+    ]
+}
+
+This minimizes API requests and allows validation before submission.
+
+---
+
+## Session Driven Retrieval
+
+The session ID acts as the primary identifier throughout the quiz lifecycle.
+
+It is used to:
+
+- Retrieve questions
+- Submit answers
+- Generate AI feedback
+- Retrieve completed feedback later
+
+All subsequent operations are scoped to a single study session.
+
+---
+
+## Module Responsibilities
+
+Questions Module
+
+- Retrieve stored questions.
+
+Answers Module
+
+- Save submitted answers.
+- Communicate with the AI service for evaluation.
+
+Feedback Module
+
+- Store AI evaluation results.
+- Retrieve completed feedback for presentation.
+
+This keeps each module responsible for one domain while allowing the Answers module to orchestrate the evaluation pipeline.
+# Engineering Decisions
+
+**Date:** 03 August 2026
+
+---
+
+# Decision 1
+
+## Separate Question Generation from Answer Evaluation
+
+### Decision
+
+Create a dedicated `evaluation` module instead of placing answer evaluation inside the existing RAG module.
+
+### Reason
+
+Question Generation and Answer Evaluation solve different problems.
+
+Question Generation pipeline:
+
+```
+PDF
+        ↓
+Chunking
+        ↓
+Embeddings
+        ↓
+Question Generation
+        ↓
+Validation
+```
+
+Answer Evaluation pipeline:
+
+```
+Student Answer
+        ↓
+Context Retrieval
+        ↓
+Answer Evaluation
+        ↓
+Feedback Validation
+```
+
+Separating these modules improves maintainability and allows each pipeline to evolve independently.
+
+---
+
+# Decision 2
+
+## Restrict Generator Input
+
+### Decision
+
+Only send the following information to the LLM:
+
+```python
+{
+    "question",
+    "reference_answer",
+    "retrieved_context",
+    "user_answer"
+}
+```
+
+### Reason
+
+The LLM does not require:
+
+- session_id
+- answer_id
+- chunk_index
+
+These values are application metadata and should remain inside the evaluation pipeline.
+
+Keeping prompts focused reduces unnecessary information and improves separation of responsibilities.
+
+---
+
+# Decision 3
+
+## Pipeline Owns Metadata
+
+### Decision
+
+The evaluation pipeline is responsible for attaching metadata to the LLM response.
+
+Generator returns:
+
+```python
+{
+    "is_correct",
+    "feedback"
+}
+```
+
+Pipeline produces:
+
+```python
+{
+    "answer_id",
+    "is_correct",
+    "feedback",
+    "retrieved_context"
+}
+```
+
+### Reason
+
+The Generator should only evaluate answers.
+
+The Pipeline is responsible for application-specific data.
+
+---
+
+# Decision 4
+
+## Dedicated Feedback Table
+
+### Decision
+
+Store evaluation results inside a separate Feedback table.
+
+Feedback record:
+
+```text
+feedback_id
+
+answer_id
+
+is_correct
+
+feedback
+
+retrieved_context
+```
+
+### Reason
+
+This normalizes the database.
+
+The Feedback table references Answers through `answer_id`, avoiding duplication while supporting session history.
+
+---
+
+# Decision 5
+
+## Session ID Returned Once
+
+### Decision
+
+Return `session_id` only once in the final evaluation payload instead of including it inside every feedback object.
+
+Returned payload:
+
+```json
+{
+    "session_id": 28,
+    "feedback": [
+        {
+            "answer_id": 1,
+            "is_correct": true,
+            "feedback": "...",
+            "retrieved_context": "..."
+        }
+    ]
+}
+```
+
+### Reason
+
+A session contains many answers.
+
+Repeating the same Session ID inside every feedback object introduces unnecessary duplication.
+
+---
+
+# Decision 6
+
+## Separate AI Pipelines
+
+### Decision
+
+Create two independent AI modules.
+
+```
+ai-service/
+
+question_generation/
+
+evaluation/
+```
+
+### Reason
+
+Question generation and answer evaluation have different responsibilities.
+
+Keeping them separate improves readability, maintainability and future scalability.
+
+Future AI capabilities such as Flashcards, Summaries and Study Plans can follow the same modular architecture.
+
+---
+
+# Decision 7
+
+## Temporary In-Memory Retrieval
+
+### Decision
+
+Use the existing in-memory FAISS vector store during MVP development.
+
+### Reason
+
+The immediate objective is validating the complete end-to-end workflow:
+
+```
+Upload PDF
+        ↓
+Generate Questions
+        ↓
+Answer Questions
+        ↓
+Evaluate Answers
+        ↓
+Display Feedback
+```
+
+Persistent vector storage will be introduced during the planned migration to pgvector after the MVP has been completed and verified.
+
+# Engineering Decisions
+
+## Date
+2026-08-04
+
+---
+
+## Decision
+
+Refactor the shared Generator class instead of creating two independent LLM clients.
+
+### Reason
+
+Both Question Generation and Answer Evaluation use the same LLM provider and configuration.
+
+Creating separate clients would duplicate:
+
+- API initialization
+- Error handling
+- JSON parsing
+
+Passing the system prompt as a parameter allows the same infrastructure to support multiple AI tasks.
+
+---
+
+## Decision
+
+Return "concept" from the LLM instead of relying only on stored question topics.
+
+### Reason
+
+Question topics stored during generation are intentionally broad.
+
+Returning the exact concept tested allows feedback to direct learners toward a much narrower revision target.
+
+Example:
+
+Topic:
+Emotional Problems
+
+Concept:
+Aggressive behaviour as a response to emotional distress
+
+The concept provides more actionable revision guidance.
+
+---
+
+## Decision
+
+Keep answer_id outside the LLM prompt.
+
+### Reason
+
+The LLM does not need database identifiers.
+
+Passing answer_id to the model wastes tokens and increases prompt size.
+
+Instead, answer_id is reattached after evaluation before returning results.
+
+# Engineering Decisions
+
+## Date
+2026-08-05
+
+---
+
+## Decision
+
+Replace FAISS with PostgreSQL + pgvector.
+
+### Reason
+
+The application already stores session information in PostgreSQL.
+
+Persisting embeddings in the same database:
+
+- removes dependency on temporary in-memory indexes
+- survives application restarts
+- allows future similarity search directly inside PostgreSQL
+- simplifies deployment
+
+---
+
+## Decision
+
+Store document text alongside embeddings.
+
+Schema:
+
+- session_id
+- chunk_index
+- text
+- embedding
+
+### Reason
+
+The Answer Evaluation Pipeline requires the original text chunk to generate feedback.
+
+Storing text with embeddings eliminates the need to reconstruct chunks from uploaded files.
+
+---
+
+## Decision
+
+Retrieve evaluation context using session_id and chunk_index.
+
+### Reason
+
+Unlike Retrieval-Augmented Generation where similarity search is required, Answer Evaluation already knows which chunk generated each question.
+
+Direct lookup is:
+
+- deterministic
+- faster
+- cheaper
+- simpler
+
+Similarity search remains available for future features but is unnecessary for evaluation.
+
+---
+
+## Decision
+
+Create a dedicated database package.
+
+### Reason
+
+Database operations should remain independent from AI pipelines.
+
+This separation allows future database changes without modifying retrieval or generation logic.
+
+# Engineering Decisions
+
+## Date
+
+2026-08-23
+
+---
+
+## Decision 1
+
+## Use `openai/gpt-oss-20b` as the Groq LLM for Question Generation
+
+### Decision
+
+Replace the previously used Llama 3.1 8B Instant model with `openai/gpt-oss-20b` for question generation.
+
+### Reason
+
+The previously used Llama model was no longer available for the project, requiring a replacement.
+
+Several replacement models were tested, including Qwen and other reasoning-oriented models. These models produced internal reasoning text before the requested JSON output, which caused the application's JSON parser to fail.
+
+`openai/gpt-oss-20b` produced the required structured output more reliably and generated higher-quality study questions.
+
+The model therefore provides a better balance between:
+
+- Output quality
+- Structured JSON compliance
+- Question quality
+- Compatibility with the existing generator architecture
+
+---
+
+## Decision 2
+
+## Treat LLM Output Format as an Application Contract
+
+### Decision
+
+The Question Generation pipeline requires the LLM to return valid JSON matching the application's expected structure.
+
+### Reason
+
+The generator directly passes the LLM response through `json.loads()` before validation.
+
+If the model returns reasoning, Markdown, explanatory text, or incomplete JSON before the actual response, parsing fails.
+
+For example:
+
+```python
+parsed_response = json.loads(content)

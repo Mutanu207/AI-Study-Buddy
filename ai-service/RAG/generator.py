@@ -51,14 +51,18 @@ class Generator:
 #private function that is called only insde this file
     def _call_llm(
         self,
+        system_prompt :str,
         prompt: str #input is prompt in the form of astring
     ) -> Dict[str, Any] | List[Dict[str, Any]]:
         """
         Send a prompt to the LLM and return the parsed JSON response.
 
         Args:
+            system_prompt:
+                Instructions that define the model's role.
+
             prompt:
-                Fully constructed prompt sent to the model.
+                The user prompt sent to the model.
 
         Returns:
             Parsed JSON returned by the LLM.
@@ -88,7 +92,7 @@ class Generator:
                     {
                         "role": "system",
                         "content": (
-                             QUESTION_SYSTEM_PROMPT
+                             system_prompt
                         ),
                     },
 
@@ -111,6 +115,9 @@ class Generator:
                 .message
                 .content
             )
+            print("RAW LLM RESPONSE:")
+            print(content)
+
 #Parse the response into JSON format and return it
             parsed_response = json.loads(
                 content
@@ -119,7 +126,7 @@ class Generator:
             logger.info(
                 "Successfully parsed JSON response."
             )
-
+           
             return parsed_response
 #runs if the response is not in JSON format
         except json.JSONDecodeError as error:
@@ -174,7 +181,8 @@ class Generator:
         ) #get the prompt from the prompt file,by calling the function on the file and passing over the inputs
 
         questions = self._call_llm(
-            prompt
+            prompt= prompt,
+            system_prompt=QUESTION_SYSTEM_PROMPT
         )   #send prompt to llm and get questions back
 
         if not isinstance(questions, list): #questions should be a list, the LLM returns a list

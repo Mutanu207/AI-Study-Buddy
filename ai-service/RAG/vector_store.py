@@ -5,6 +5,10 @@ import faiss #vector db
 import numpy as np #handles array efficently
 from langchain_core.documents import Document
 
+#to remove
+import os
+import pickle
+
 logger = logging.getLogger(__name__)
 
 
@@ -68,8 +72,107 @@ class VectorStoreManager:
             embeddings
         )
 
-        self.documents = documents
+        self.documents = documents #self.documents is a list of Document objects, which are stored in the vector store memory for later retrieval.
 
         logger.info(
             "Embeddings stored successfully."
+        )
+
+        #to remove function
+    def save_index(
+    self,
+    folder_path: str,
+    ) -> None:
+        """
+        Save the FAISS index and associated documents to disk.
+        """
+
+        if self.index is None:
+
+            logger.error(
+            "Cannot save an empty FAISS index."
+            )
+
+            raise RuntimeError(
+            "Vector index has not been created."
+            )
+
+        os.makedirs(
+            folder_path,
+            exist_ok=True,
+        )
+
+        faiss.write_index(
+            self.index,
+            os.path.join(
+                folder_path,
+                "index.faiss",
+            ),
+        )
+
+        with open(
+            os.path.join(
+                folder_path,
+                "documents.pkl",
+            ),
+            "wb",
+        ) as file:
+
+            pickle.dump(
+                self.documents,
+                file,
+            )
+
+        logger.info(
+            "Vector store saved successfully."
+        )
+
+        #remove function
+    def load_index(
+    self,
+    folder_path: str,
+) -> None:
+        """
+        Load a previously saved vector store.
+        """
+
+        index_path = os.path.join(
+            folder_path,
+            "index.faiss",
+        )
+
+        documents_path = os.path.join(
+            folder_path,
+            "documents.pkl",
+        )
+
+        if (
+            not os.path.exists(index_path)
+            or
+            not os.path.exists(documents_path)
+        ):
+
+            logger.error(
+                "Saved vector store not found."
+            )
+
+            raise RuntimeError(
+                "Vector store files are missing."
+            )
+
+        self.index = faiss.read_index(
+            index_path
+        )
+
+        with open(
+            documents_path,
+            "rb",
+        ) as file:
+
+            self.documents = pickle.load(
+                file
+            )
+
+        logger.info(
+            "Vector store loaded successfully."
         )

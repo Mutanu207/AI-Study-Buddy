@@ -78,6 +78,35 @@ export const createSessions = async(docid) => {
     const result = await api.post("/sessions/create", {
         docId:docid //when we send a request we pick it up as req.body.docId in sessions//
     } )
+        
+    return result.data
+}
+export const userQuestions = async(sessionId) => {
+    const result = await api.get(`/questions/fetch/${sessionId}`)
     console.log(result.data)
     return result.data
 }
+
+export const saveAnswers = async (payload) => {
+    const result = await api.post("/answers/save", payload);
+    return result.data;
+};
+
+export const fetchFeedback =async (sessionId) => {
+    const result= await api.get(`/feedback/fetch/${sessionId}`)
+    console.log(result.data)
+    return result.data;
+}
+export const fetchSession = async () => { 
+    const result = await api.get('/sessions/fetch')
+    console.log(result.data)
+    return result.data
+}
+export const sessionFeedback = async (sessionId) => {
+    const result = await api.get(`/sessions/userSession/${sessionId}`)
+    console.log(result)
+    return result.data
+
+}
+
+

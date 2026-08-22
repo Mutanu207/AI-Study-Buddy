@@ -11,7 +11,6 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
-import AdbIcon from '@mui/icons-material/Adb';
 import { useNavigate } from "react-router-dom";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
@@ -19,7 +18,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import TextField from '@mui/material/TextField';
 import { useState } from 'react';
-import { updateUsername, logoutCurrentUser } from '../serivce/api';
+import { updateUsername, logoutCurrentUser } from '../service/api';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 
@@ -64,7 +63,7 @@ function Navbar(props) {
   };
 
   const navigate = useNavigate();
-
+//when a setting is clicked the state is set to true to open the dialog box
   const handleSettingClick = (setting) => {
   handleCloseUserMenu();
   if (setting === "Logout") {
@@ -180,7 +179,6 @@ const handleProfileUpdate = async () => {
               ))}
             </Menu>
           </Box>
-          <AdbIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
           <Typography
             variant="h5"
             noWrap
