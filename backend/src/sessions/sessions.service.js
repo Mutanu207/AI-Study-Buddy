@@ -1,4 +1,4 @@
-import { createNewSessions,fetchFilePath } from "./sessions.model.js"
+import { createNewSessions,fetchFilePath, fetchSessions, fetchUserDetails, fetchFileName} from "./sessions.model.js"
 import { generateQuestions } from "../ai/ai.service.js"
 import { saveQuestions } from "../questions/questions.service.js"
 import path from "path";
@@ -33,3 +33,38 @@ export const newSessions = async (document_id,userid) => {
     }
 }
 
+export const displaySessionsService = async (userId) => {
+    try{
+        const sessions = await fetchSessions(userId)
+        if(!sessions){
+            throw new Error("No sessions found")
+        }
+        console.log(sessions) 
+        //return an array of all the user session with the ids,score and timetaken  
+        return sessions
+    }
+    catch(error){
+        console.error(error)
+        throw new Error(error.message)
+    }
+}
+export const fetchSessionDetails = async (userId,sessionId) => {
+    try{
+        const userSession= await fetchUserDetails (userId, sessionId)
+        if (!userSession){
+            throw new Error("No details found")
+        }
+        const fileName= await fetchFileName(sessionId)
+        const payload= {
+            fileName,
+            userSessionDetails: userSession
+
+        }
+        return payload
+
+    }
+     catch(error){
+        console.error(error)
+        throw new Error(error.message)
+    }
+}

@@ -48,3 +48,21 @@ export const getAnswerContext = async (questionId) => {
         throw error;
     }
 };
+
+export const saveScore = async (sessionId, score) => {
+    try {
+        const query = `
+        UPDATE sessions
+        SET score = $1, completed_at = NOW(),status='Completed'
+        WHERE id = $2;
+    `;
+
+    const values = [score, sessionId];
+
+    await pool.query(query, values);
+
+    } catch (error) {
+        console.error("Error saving score:", error);
+        throw error;
+    }
+};

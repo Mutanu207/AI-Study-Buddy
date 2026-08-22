@@ -1,8 +1,9 @@
-import { saveUserAnswers, getAnswerContext } from "./answers.model.js";
+import { saveUserAnswers, getAnswerContext, saveScore } from "./answers.model.js";
 import { evaluateAnswers } from "../ai/ai.service.js";
 import { receiveFeedback } from "../feedback/feedback.service.js";
 export const userAnswers = async (sessionId, answers) => { //answers is an array
     try {
+        let score = 0;
         const answersForEvaluation = [];
         //for one answer object in the array save the info to answers db, return the info, use question id of the naswer object
         //and fetch the remaining info to send to ai folder, combine both to one object, then push object to the array we will send to the ai folder, one object at a time
@@ -32,6 +33,18 @@ export const userAnswers = async (sessionId, answers) => { //answers is an array
         const feedback= await evaluateAnswers(payload);
         console.log("Feedback from AI evaluation:", feedback); 
         //send feedback from ai to feedback folder
+       const scoreFeedback= feedback.feedback
+       //CHECK IF ITS AN ARRAY
+        if (!Array.isArray(scoreFeedback)) {
+            throw new Error("AI feedback is not an array");
+        }
+
+        for (const item of scoreFeedback) {
+        if (item.is_correct === true) {
+            score += 1;}}
+        //SAVE SCORE TO SES DB
+        await saveScore(sessionId, score);
+        //send feedback to feedback folder
         await receiveFeedback(feedback)
 
         
