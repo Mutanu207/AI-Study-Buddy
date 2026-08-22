@@ -115,6 +115,9 @@ class Generator:
                 .message
                 .content
             )
+            print("RAW LLM RESPONSE:")
+            print(content)
+
 #Parse the response into JSON format and return it
             parsed_response = json.loads(
                 content
@@ -123,7 +126,7 @@ class Generator:
             logger.info(
                 "Successfully parsed JSON response."
             )
-
+           
             return parsed_response
 #runs if the response is not in JSON format
         except json.JSONDecodeError as error:

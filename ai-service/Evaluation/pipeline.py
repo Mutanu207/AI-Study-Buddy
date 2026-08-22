@@ -102,6 +102,7 @@ class AnswerEvaluationPipeline:
             "Successfully evaluated %d answers.",
             len(evaluated_answers),
         )
+        print("Evaluated Answers:", evaluated_answers)
 
         return {
 
