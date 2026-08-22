@@ -789,3 +789,139 @@ Unlike FAISS, pgvector provides:
 - simpler retrieval for known chunk references
 
 The migration also highlighted the importance of clearly separating persistence, retrieval and AI inference responsibilities.
+
+# Engineering Journal
+
+## Date
+
+2026-08-10
+
+## Objective
+
+Complete the Feedback page and implement the backend data flow required to retrieve and display evaluation feedback for a completed quiz session.
+
+---
+
+## Work Completed
+
+### Feedback Page
+
+- Designed the Feedback page layout using React and Material UI.
+- Created a vertical card-based layout for displaying feedback for each question.
+- Designed each feedback card to display:
+  - Question
+  - User answer
+  - Feedback
+  - Correctness status
+  - Retrieved context
+  - Concept tested
+- Added an end-of-review button to allow the learner to return to the starter page.
+- Implemented the Feedback page in `Feedback.jsx`.
+
+### Frontend Data Fetching
+
+- Created a custom React hook for fetching feedback data.
+- Used the session ID to request feedback belonging to the current quiz session.
+- Connected the Feedback page to the backend feedback endpoint.
+- Used the fetched data to dynamically render each feedback item.
+
+### Backend Feedback Retrieval
+
+- Implemented backend logic for retrieving feedback associated with a specific session.
+- Used the session ID to identify the learner's completed quiz attempt.
+- Implemented a SQL `JOIN` to combine information from the Feedback, Answers, and Questions tables.
+- Used the answer ID stored in the Feedback table to locate the corresponding answer.
+- Used the question ID associated with the answer to retrieve the original question text.
+- Returned the combined information required by the Feedback page.
+
+### Data Flow
+
+The implemented feedback retrieval flow is:
+
+```text
+Feedback Page
+      ↓
+Custom Feedback Hook
+      ↓
+Backend Feedback Endpoint
+      ↓
+Feedback Service
+      ↓
+Feedback Model
+      ↓
+SQL JOIN
+      ↓
+Feedback + Answers + Questions
+      ↓
+Feedback Page
+
+# Engineering Journal
+
+## Date
+
+23 August 2026
+
+---
+
+## Objective
+
+Continue building the completed-session experience by allowing learners to review previous study sessions, including their questions, answers, feedback, reference answers, concepts and uploaded document information.
+
+---
+
+## Work Completed
+
+### Session History Page
+
+- Continued implementing the Sessions page for displaying previous study attempts.
+- Displayed the user's previous sessions in a Material UI interface.
+- Included session-level information such as:
+  - Session number
+  - Score
+  - Time taken
+  - View Details action
+- Preserved the session ID when retrieving the session list so that each session can be used to retrieve its associated historical data.
+
+---
+
+### Session Details Interface
+
+Designed the Session Details experience using a full-screen Material UI Dialog.
+
+The planned dialog displays:
+
+- Session title
+- Uploaded file name
+- Questions
+- User answers
+- Reference answers
+- AI feedback
+- Correctness
+- Concepts tested
+
+The View Details button is responsible for opening the dialog and retrieving information for the specific session selected by the learner.
+
+---
+
+### Session Detail Data Flow
+
+Designed the data flow for retrieving historical session information:
+
+```text
+Sessions Page
+      ↓
+User clicks View Details
+      ↓
+Selected Session ID
+      ↓
+Frontend API Request
+      ↓
+Backend Session Details Endpoint
+      ↓
+Verify Session/User Ownership
+      ↓
+Database Queries
+      ↓
+Questions + Answers + Feedback + Document
+      ↓
+Frontend Dialog

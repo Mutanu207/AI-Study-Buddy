@@ -888,3 +888,54 @@ Database operations should remain independent from AI pipelines.
 
 This separation allows future database changes without modifying retrieval or generation logic.
 
+# Engineering Decisions
+
+## Date
+
+2026-08-23
+
+---
+
+## Decision 1
+
+## Use `openai/gpt-oss-20b` as the Groq LLM for Question Generation
+
+### Decision
+
+Replace the previously used Llama 3.1 8B Instant model with `openai/gpt-oss-20b` for question generation.
+
+### Reason
+
+The previously used Llama model was no longer available for the project, requiring a replacement.
+
+Several replacement models were tested, including Qwen and other reasoning-oriented models. These models produced internal reasoning text before the requested JSON output, which caused the application's JSON parser to fail.
+
+`openai/gpt-oss-20b` produced the required structured output more reliably and generated higher-quality study questions.
+
+The model therefore provides a better balance between:
+
+- Output quality
+- Structured JSON compliance
+- Question quality
+- Compatibility with the existing generator architecture
+
+---
+
+## Decision 2
+
+## Treat LLM Output Format as an Application Contract
+
+### Decision
+
+The Question Generation pipeline requires the LLM to return valid JSON matching the application's expected structure.
+
+### Reason
+
+The generator directly passes the LLM response through `json.loads()` before validation.
+
+If the model returns reasoning, Markdown, explanatory text, or incomplete JSON before the actual response, parsing fails.
+
+For example:
+
+```python
+parsed_response = json.loads(content)
