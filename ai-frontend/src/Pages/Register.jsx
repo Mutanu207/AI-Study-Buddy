@@ -6,7 +6,7 @@ import PrimaryButton from "../Components/PrimaryButton";
 import TextField from "@mui/material/TextField";
 import Link from "@mui/material/Link";
 import { Link as RouterLink } from "react-router-dom";
-import {registerUser, GOOGLE_AUTH_URL} from "../serivce/api";
+import {registerUser, GOOGLE_AUTH_URL} from "../service/api";
 import { useNavigate } from "react-router-dom";
 import  Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";

@@ -10,7 +10,7 @@ import Alert from "@mui/material/Alert";
 import { useNavigate } from "react-router-dom";
 import PrimaryButton from "../Components/PrimaryButton";
 import { useUsername } from "../hooks/useUsername";
-import { uploadPdf, createSessions } from "../serivce/api";
+import { uploadPdf, createSessions } from "../service/api";
 import CircularProgress from '@mui/material/CircularProgress';
 
 

@@ -18,7 +18,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import TextField from '@mui/material/TextField';
 import { useState } from 'react';
-import { updateUsername, logoutCurrentUser } from '../serivce/api';
+import { updateUsername, logoutCurrentUser } from '../service/api';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 
@@ -63,7 +63,7 @@ function Navbar(props) {
   };
 
   const navigate = useNavigate();
-
+//when a setting is clicked the state is set to true to open the dialog box
   const handleSettingClick = (setting) => {
   handleCloseUserMenu();
   if (setting === "Logout") {

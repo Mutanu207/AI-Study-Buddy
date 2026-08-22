@@ -5,7 +5,7 @@ import PrimaryButton from "../Components/PrimaryButton";
 import { useParams } from "react-router-dom";
 import { useFetchQuestions } from "../hooks/fetchQuestions.jsx";
 import { useState } from "react";
-import { saveAnswers } from "../serivce/api.js";
+import { saveAnswers } from "../service/api.js";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import { useNavigate } from "react-router-dom";

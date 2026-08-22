@@ -97,5 +97,16 @@ export const fetchFeedback =async (sessionId) => {
     console.log(result.data)
     return result.data;
 }
+export const fetchSession = async () => { 
+    const result = await api.get('/sessions/fetch')
+    console.log(result.data)
+    return result.data
+}
+export const sessionFeedback = async (sessionId) => {
+    const result = await api.get(`/sessions/userSession/${sessionId}`)
+    console.log(result)
+    return result.data
+
+}
 
 

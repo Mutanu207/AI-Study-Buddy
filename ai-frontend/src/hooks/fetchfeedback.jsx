@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { fetchFeedback } from "../serivce/api.js";
+import { fetchFeedback } from "../service/api.js";
 
 export function useFetchFeedback(sessionId) {
     const [feedback, setfeedback] = useState([]);
@@ -10,6 +10,7 @@ export function useFetchFeedback(sessionId) {
         const sessionFeedback = async () => {
             try {
                 const data = await fetchFeedback(sessionId);
+                console.log(data)
                 setfeedback(data);
             } catch (error) {
                 setError(error);

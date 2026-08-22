@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { fetchUser } from "../serivce/api";
+import { fetchUser } from "../service/api";
 
 export function useUsername() {
     const [username, setUsername] = useState("");

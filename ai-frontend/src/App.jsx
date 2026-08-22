@@ -4,7 +4,7 @@ import Register from "./Pages/Register";
 import StarterPage from "./Pages/StarterPage";
 import AuthSuccess from "./Pages/AuthSuccess";
 import {Routes, Route} from "react-router-dom";
-import ProtectedRoute from "./serivce/ProtectedRoute";
+import ProtectedRoute from "./service/ProtectedRoute";
 import Sessions from "./Pages/Sessions";
 import Dashboard from "./Pages/Dashboard"
 import About from "./Pages/About"

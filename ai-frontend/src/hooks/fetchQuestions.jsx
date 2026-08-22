@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { userQuestions } from "../serivce/api.js";
+import { userQuestions } from "../service/api.js";
 
 export function useFetchQuestions(sessionId) {
     const [questions, setQuestions] = useState([]);

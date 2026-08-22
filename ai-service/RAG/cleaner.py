@@ -39,7 +39,15 @@ def clean_text(raw_text: str) -> str:
 
     # Remove trailing and leading whitespace
     cleaned_text = cleaned_text.strip()
-
+    # Remove PDF navigation/header artifacts
+    # Example:
+    # c OCUCK-DCeL ◀◀▶▶ ◀▶ ◀DocDoc▶ Back Close
+    cleaned_text = re.sub(
+    r"^\s*c\s+OCUCK-DCeL[^\n]*Back Close\s*",
+    "",
+    cleaned_text,
+    flags=re.IGNORECASE | re.MULTILINE
+    )
     #logging
     logger.info("Text cleaning completed successfully.")
 

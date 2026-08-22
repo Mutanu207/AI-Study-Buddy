@@ -8,6 +8,7 @@ function Feedback () {
     const {sessionId}= useParams();
     //send session id to hook function which uses it to grab questions and get feedback back
     const{ feedback,loading}= useFetchFeedback(sessionId)
+    console.log("from jsx", feedback)
     if (loading) return  <Typography variant="h6" align="center" sx={{ mt: 4 }}> Loading...</Typography>;
     return (
         <Box
@@ -70,7 +71,7 @@ function Feedback () {
                              <Typography sx={{mb:3}}>
                              <span style={{fontSize: "1.05rem",fontWeight: "bold",color: "#1A1A40",}}>Feedback: </span>
                              {item.feedback}
-                            </Typography>
+                            </Typography> 
                             <Typography
                              sx={{fontSize: "1.05rem",fontWeight: "bold",mb:3, color:item.is_correct ? "#15803D" : "#B91C1C"}}>
                                 Mark: {item.is_correct ? "Correct" : "Incorrect"}
