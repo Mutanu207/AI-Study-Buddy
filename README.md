@@ -51,12 +51,11 @@ This project is being built to explore modern software engineering practices whi
 
 * Dedicated FastAPI AI Microservice
 * Express ↔ FastAPI Communication
-* Production RAG Pipeline *(currently under development)*
-
-### Upcoming
-
-* AI Question Generation
+* Production RAG Pipeline 
+*  AI Question Generation
 * AI Answer Evaluation
+
+### Other App Features
 * Personalized Feedback
 * Dashboard Analytics
 * Session History
